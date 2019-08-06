@@ -1,0 +1,44 @@
+{
+  "name": "@uphold/anonymizer",
+  "version": "1.1.0",
+  "description": "Object redaction with whitelist as main feature.",
+  "homepage": "https://github.com/uphold/anonymizer#readme",
+  "bugs": {
+    "url": "https://github.com/uphold/anonymizer/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uphold/anonymizer.git"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "main": "src",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "modulePaths": [
+      "<rootDir>"
+    ],
+    "restoreMocks": true,
+    "testEnvironment": "node",
+    "testRegex": "test/.*\\.test.js$"
+  },
+  "dependencies": {
+    "json-stringify-safe": "^5.0.1",
+    "traverse": "^0.6.6"
+  },
+  "devDependencies": {
+    "jest": "^24.8.0",
+    "pre-commit": "^1.2.2"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
+}
