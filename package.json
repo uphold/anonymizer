@@ -1,6 +1,6 @@
 {
   "name": "@uphold/anonymizer",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Object redaction with whitelist as main feature.",
   "homepage": "https://github.com/uphold/anonymizer#readme",
   "bugs": {
@@ -31,6 +31,7 @@
     "testRegex": "test/.*\\.test.js$"
   },
   "dependencies": {
+    "json-stringify-safe": "^5.0.1",
     "traverse": "^0.6.6"
   },
   "devDependencies": {
