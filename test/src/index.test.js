@@ -70,5 +70,14 @@ describe('Anonymizer', () => {
 
       expect(anonymize({ parent: { foo: 'bar' } })).toEqual({ parent: { foo: 'bar' } });
     });
+
+    it('should allow circular references', () => {
+      const object = {};
+      object.reference = object;
+
+      const anonymize = anonymizer(['*']);
+
+      expect(anonymize(object)).toEqual({ reference: '[Circular ~]' });
+    });
   });
 });
