@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 
+const stringify = require('json-stringify-safe');
 const traverse = require('traverse');
 
 /**
@@ -21,7 +22,7 @@ module.exports = (whitelist = []) => {
   const paths = new RegExp(`^(${terms.replace('*', '.*')})$`, 'i');
 
   return values => {
-    const clone = JSON.parse(JSON.stringify(values));
+    const clone = JSON.parse(stringify(values));
 
     traverse(clone).forEach(function() {
       if (!this.isLeaf) {
