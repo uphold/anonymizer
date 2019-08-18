@@ -19,7 +19,7 @@ const replacement = '--REDACTED--';
 
 module.exports = (whitelist = []) => {
   const terms = whitelist.join('|');
-  const paths = new RegExp(`^(${terms.replace('*', '.*')})$`, 'i');
+  const paths = new RegExp(`^(${terms.replace(/\*/g, '.*')})$`, 'i');
 
   return values => {
     const clone = JSON.parse(stringify(values));
