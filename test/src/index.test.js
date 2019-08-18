@@ -66,9 +66,9 @@ describe('Anonymizer', () => {
     });
 
     it('should allow using `*` in the whitelist path', () => {
-      const anonymize = anonymizer(['*.foo']);
+      const anonymize = anonymizer(['*.foo', '*.foobar']);
 
-      expect(anonymize({ parent: { foo: 'bar' } })).toEqual({ parent: { foo: 'bar' } });
+      expect(anonymize({ parent: { foo: 'bar', foobar: 'foobiz' } })).toEqual({ parent: { foo: 'bar', foobar: 'foobiz' } });
     });
 
     it('should allow circular references', () => {
