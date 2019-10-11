@@ -8,7 +8,8 @@ Object redaction with whitelist as main feature.
 
 ```js
 const anonymizer = require('@uphold/anonymizer');
-const anonymize = anonymizer(['foo.key', 'bar.*']);
+const whitelist = ['foo.key', 'bar.*'];
+const anonymize = anonymizer(whitelist);
 
 anonymize({ foo: { key: 'public', another: 'bar' }, bar: { foo: 1, bar: 2 } });
 
