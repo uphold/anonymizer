@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/uphold/anonymizer.git"
   },
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "main": "src",
   "directories": {
     "test": "test"

@@ -14,3 +14,7 @@ anonymize({ foo: { key: 'public', another: 'bar' }, bar: { foo: 1, bar: 2 } });
 
 //=> { foo: { key: 'public', another: '--REDACTED--' }, bar: { foo: 1, bar: 2 } }
 ```
+
+## License
+
+MIT
