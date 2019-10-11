@@ -35,7 +35,7 @@
     "traverse": "^0.6.6"
   },
   "devDependencies": {
-    "jest": "^24.8.0",
+    "jest": "^24.9.0",
     "pre-commit": "^1.2.2"
   },
   "publishConfig": {
