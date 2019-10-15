@@ -6,10 +6,7 @@
   "bugs": {
     "url": "https://github.com/uphold/anonymizer/issues"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/uphold/anonymizer.git"
-  },
+  "repository": "uphold/anonymizer",
   "license": "MIT",
   "main": "src",
   "directories": {
