@@ -79,5 +79,19 @@ describe('Anonymizer', () => {
 
       expect(anonymize(object)).toEqual({ reference: '[Circular ~]' });
     });
+
+    it('should obfuscate part of a string', () =>{
+      const anonymize = anonymizer(['parent.foo.id', 'parent.foo.UserId']);
+
+      expect(anonymize({ parent: { foo: 'url?query=random@email.com&id=foobix&UserId=abc123', foobar: 'foobiz' } })).toEqual({ parent: { foo: 'url?query=--REDACTED--&id=foobix&UserId=abc123', foobar: '--REDACTED--' } });
+
+    });
+
+    it('should expose all fields of a query string', () =>{
+      const anonymize = anonymizer(['parent.*']);
+
+      expect(anonymize({ parent: { foo: 'url?query=random@email.com&id=foobix&UserId=abc123', foobar: 'foobiz' } })).toEqual({ parent: { foo: 'url?query=random@email.com&id=foobix&UserId=abc123', foobar: 'foobiz' } });
+
+    });
   });
 });
