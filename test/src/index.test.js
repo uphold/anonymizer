@@ -37,6 +37,12 @@ describe('Anonymizer', () => {
       });
     });
 
+    it(`should default to an empty whitelist`, () => {
+      const anonymize = anonymizer();
+
+      expect(anonymize({ foo: 'foo' })).toEqual({ foo: '--REDACTED--' });
+    });
+    
     it('should not obfuscate recursively the keys of an object that are part of the whitelist', () => {
       const anonymize = anonymizer(whitelist);
 
