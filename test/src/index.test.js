@@ -71,6 +71,12 @@ describe('Anonymizer', () => {
       expect(anonymize({ foo: 'bar' })).toEqual({ foo: 'bar' });
     });
 
+    it('should not treat a `.` in the whitelist as a special character in the regexp', () => {
+      const anonymize = anonymizer(['foo.bar']);
+
+      expect(anonymize({ foo: { bar: 'biz' }, fooabar: 'foobiz' })).toEqual({ foo: { bar: 'biz' }, fooabar: '--REDACTED--' });
+    });
+
     it('should allow using `*` in the whitelist path', () => {
       const anonymize = anonymizer(['*.foo', '*.foobar']);
 
