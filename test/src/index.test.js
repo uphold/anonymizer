@@ -42,19 +42,21 @@ describe('Anonymizer', () => {
 
       expect(anonymize({ foo: 'foo' })).toEqual({ foo: '--REDACTED--' });
     });
-    
+
     it('should not obfuscate recursively the keys of an object that are part of the whitelist', () => {
       const anonymize = anonymizer(whitelist);
 
-      expect(anonymize({
-        foo: {
-          bar: {
-            baz: { bax: [2, 3, { bax: 4, [whitelist[1]]: '5' }] },
-            [whitelist[0]]: 'foobar',
-            [whitelist[2]]: 'foobiz'
+      expect(
+        anonymize({
+          foo: {
+            bar: {
+              baz: { bax: [2, 3, { bax: 4, [whitelist[1]]: '5' }] },
+              [whitelist[0]]: 'foobar',
+              [whitelist[2]]: 'foobiz'
+            }
           }
-        }
-      })).toEqual({
+        })
+      ).toEqual({
         foo: {
           bar: {
             baz: { bax: ['--REDACTED--', '--REDACTED--', { bax: '--REDACTED--', [whitelist[1]]: '--REDACTED--' }] },
@@ -74,17 +76,23 @@ describe('Anonymizer', () => {
     it('should not treat a `.` in the whitelist as a special character in the regexp', () => {
       const anonymize = anonymizer(['foo.bar']);
 
-      expect(anonymize({ foo: { bar: 'biz' }, fooabar: 'foobiz' })).toEqual({ foo: { bar: 'biz' }, fooabar: '--REDACTED--' });
+      expect(anonymize({ foo: { bar: 'biz' }, fooabar: 'foobiz' })).toEqual({
+        foo: { bar: 'biz' },
+        fooabar: '--REDACTED--'
+      });
     });
 
     it('should allow using `*` in the whitelist path', () => {
       const anonymize = anonymizer(['*.foo', '*.foobar']);
 
-      expect(anonymize({ parent: { foo: 'bar', foobar: 'foobiz' } })).toEqual({ parent: { foo: 'bar', foobar: 'foobiz' } });
+      expect(anonymize({ parent: { foo: 'bar', foobar: 'foobiz' } })).toEqual({
+        parent: { foo: 'bar', foobar: 'foobiz' }
+      });
     });
 
     it('should allow circular references', () => {
       const object = {};
+
       object.reference = object;
 
       const anonymize = anonymizer(['*']);

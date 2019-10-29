@@ -13,6 +13,7 @@
     "test": "test"
   },
   "scripts": {
+    "lint": "uphold-scripts lint",
     "test": "uphold-scripts test"
   },
   "dependencies": {
@@ -22,6 +23,9 @@
   "devDependencies": {
     "uphold-scripts": "^0.4.0"
   },
+  "pre-commit": [
+    "lint"
+  ],
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
   }
