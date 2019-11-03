@@ -99,5 +99,36 @@ describe('Anonymizer', () => {
 
       expect(anonymize(object)).toEqual({ reference: '[Circular ~]' });
     });
+
+    it('should apply serializers', () => {
+      const error = new Error('foobar');
+
+      const anonymize = anonymizer(['*'], {
+        serializers: {
+          e: () => {
+            throw new Error('foobaz');
+          },
+          error2: () => {
+            throw new Error('foobiz');
+          }
+        }
+      });
+
+      const result = anonymize({
+        e: error,
+        err: {
+          statusCode: 400
+        },
+        error,
+        error2: error,
+        foo: 'bar'
+      });
+
+      console.log(require('util').inspect({ result }, { depth: null }));
+
+      expect(result.error).toHaveProperty('name', 'Error');
+      expect(result.error).toHaveProperty('message', 'foobar');
+      expect(result.err).toHaveProperty('statusCode', 400);
+    });
   });
 });

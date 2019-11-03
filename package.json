@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "json-stringify-safe": "^5.0.1",
+    "serialize-error": "^5.0.0",
     "traverse": "^0.6.6"
   },
   "devDependencies": {
