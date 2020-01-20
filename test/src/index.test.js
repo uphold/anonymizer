@@ -37,6 +37,18 @@ describe('Anonymizer', () => {
       });
     });
 
+    it(`should obfuscate keys whose type is Buffer`, () => {
+      const anonymize = anonymizer();
+
+      expect(anonymize({ foo: Buffer.from('foobarfoobar') })).toEqual({ foo: '--REDACTED--' });
+    });
+
+    it(`should not obfuscate Buffer-type keys that are whitelisted`, () => {
+      const anonymize = anonymizer(['foo']);
+
+      expect(anonymize({ foo: Buffer.from('foobarfoobar') })).toEqual({ foo: Buffer.from('foobarfoobar') });
+    });
+
     it(`should default to an empty whitelist`, () => {
       const anonymize = anonymizer();
 

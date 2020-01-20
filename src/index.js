@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-const stringify = require('json-stringify-safe');
+const clone = require('clone');
 const traverse = require('traverse');
 
 /**
@@ -22,11 +22,21 @@ module.exports = (whitelist = []) => {
   const paths = new RegExp(`^(${terms.replace('.', '\\.').replace(/\*/g, '.*')})$`, 'i');
 
   return values => {
-    const clone = JSON.parse(stringify(values));
+    const obj = clone(values);
 
-    traverse(clone).forEach(function() {
-      if (!this.isLeaf) {
+    traverse(obj).forEach(function() {
+      if (this.circular) {
+        return '[Circular ~]';
+      }
+
+      const isBuffer = this.node instanceof Buffer;
+
+      if (!isBuffer && !this.isLeaf) {
         return;
+      }
+
+      if (isBuffer && paths.test(this.path.join('.'))) {
+        return this.update(this.node, true);
       }
 
       if (!paths.test(this.path.join('.'))) {
@@ -34,6 +44,6 @@ module.exports = (whitelist = []) => {
       }
     });
 
-    return clone;
+    return obj;
   };
 };

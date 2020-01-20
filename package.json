@@ -17,7 +17,7 @@
     "test": "uphold-scripts test"
   },
   "dependencies": {
-    "json-stringify-safe": "^5.0.1",
+    "clone": "^2.1.2",
     "traverse": "^0.6.6"
   },
   "devDependencies": {
