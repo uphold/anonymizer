@@ -15,7 +15,9 @@
   "scripts": {
     "changelog": "uphold-scripts changelog $npm_package_version",
     "lint": "uphold-scripts lint",
-    "test": "uphold-scripts test"
+    "release": "uphold-scripts release",
+    "test": "uphold-scripts test",
+    "version": "uphold-scripts version"
   },
   "dependencies": {
     "clone": "^2.1.2",
