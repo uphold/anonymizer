@@ -13,6 +13,7 @@
     "test": "test"
   },
   "scripts": {
+    "changelog": "uphold-scripts changelog $npm_package_version",
     "lint": "uphold-scripts lint",
     "test": "uphold-scripts test"
   },
