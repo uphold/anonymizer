@@ -17,9 +17,11 @@ const replacement = '--REDACTED--';
  * Module exports.
  */
 
-module.exports = (whitelist = []) => {
-  const terms = whitelist.join('|');
-  const paths = new RegExp(`^(${terms.replace('.', '\\.').replace(/\*/g, '.*')})$`, 'i');
+module.exports = ({ blacklist = [], whitelist = [] } = {}) => {
+  const whitelistTerms = whitelist.join('|');
+  const whitelistPaths = new RegExp(`^(${whitelistTerms.replace('.', '\\.').replace(/\*/g, '.*')})$`, 'i');
+  const blacklistTerms = blacklist.join('|');
+  const blacklistPaths = new RegExp(`^(${blacklistTerms.replace('.', '\\.').replace(/\*/g, '.*')})$`, 'i');
 
   return values => {
     const obj = clone(values);
@@ -29,17 +31,18 @@ module.exports = (whitelist = []) => {
         return '[Circular ~]';
       }
 
+      const path = this.path.join('.');
       const isBuffer = this.node instanceof Buffer;
 
       if (!isBuffer && !this.isLeaf) {
         return;
       }
 
-      if (isBuffer && paths.test(this.path.join('.'))) {
+      if (isBuffer && (!blacklistPaths.test(path) && whitelistPaths.test(path))) {
         return this.update(this.node, true);
       }
 
-      if (!paths.test(this.path.join('.'))) {
+      if (blacklistPaths.test(path) || !whitelistPaths.test(path)) {
         this.update(replacement);
       }
     });
