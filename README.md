@@ -1,19 +1,37 @@
 # anonymizer
-Object redaction with whitelist as main feature.
+Object redaction with whitelist and blacklist. Blacklist items have higher priority and will always supercede the whitelist.
 
 ## Arguments
-1. `whitelist` _(Object)_: The whitelist object.
+1. `whitelist` _(Array)_: The whitelist array.
+2. `blacklist` _(Array)_: The blacklist array.
 
 ### Example
 
 ```js
 const anonymizer = require('@uphold/anonymizer');
-const whitelist = ['foo.key', 'bar.*'];
-const anonymize = anonymizer(whitelist);
+const whitelist = ['foo.key', 'foo.depth.*', 'bar.*', 'toAnonymize.baz', 'toAnonymizeSuperString'];
+const blacklist = ['foo.depth.innerBlacklist', 'toAnonymize.*'];
+const anonymize = anonymizer({ blacklist, whitelist });
 
-anonymize({ foo: { key: 'public', another: 'bar' }, bar: { foo: 1, bar: 2 } });
+const data = {
+  foo: { key: 'public', another: 'bar', depth: { bar: 10, innerBlacklist: 11 } },
+  bar: { foo: 1, bar: 2 },
+  toAnonymize: { baz: 11, bar: 12 },
+  toAnonymizeSuperString: 'foo'
+};
 
-//=> { foo: { key: 'public', another: '--REDACTED--' }, bar: { foo: 1, bar: 2 } }
+anonymize(data);
+
+// {
+//   foo: {
+//     key: 'public',
+//     another: '--REDACTED--',
+//     depth: { bar: 10, innerBlacklist: '--REDACTED--' }
+//   },
+//   bar: { foo: 1, bar: 2 },
+//   toAnonymize: { baz: '--REDACTED--', bar: '--REDACTED--' },
+//   toAnonymizeSuperString: '--REDACTED--'
+// }
 ```
 
 ## Releasing a new version
