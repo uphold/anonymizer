@@ -1,6 +1,12 @@
 # Changelog
 
-## [2.0.0](https://github.com/uphold/anonymizer/releases/tag/v2.0.0) (2020-02-17)
+## [3.0.0](https://github.com/uphold/anonymizer/releases/tag/v3.0.0) (2020-05-19)
+- Add a blacklist with higher priority than whitelist [\#31](https://github.com/uphold/anonymizer/pull/31) ([adisney-up](https://github.com/adisney-up))
+- Add instructions to release new versions of the project [\#20](https://github.com/uphold/anonymizer/pull/20) ([waldyrious](https://github.com/waldyrious))
+- Replace travis with github test action [\#30](https://github.com/uphold/anonymizer/pull/30) ([nunofgs](https://github.com/nunofgs))
+- Remove github package registry [\#29](https://github.com/uphold/anonymizer/pull/29) ([nunofgs](https://github.com/nunofgs))
+
+## [v2.0.0](https://github.com/uphold/anonymizer/releases/tag/v2.0.0) (2020-02-17)
 - Add version and release scripts [\#25](https://github.com/uphold/anonymizer/pull/25) ([pedrobranco](https://github.com/pedrobranco))
 - Add changelog script [\#24](https://github.com/uphold/anonymizer/pull/24) ([pedrobranco](https://github.com/pedrobranco))
 - Handle Buffer obfuscation [\#23](https://github.com/uphold/anonymizer/pull/23) ([pedrobranco](https://github.com/pedrobranco))
