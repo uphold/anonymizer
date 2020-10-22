@@ -1,6 +1,14 @@
 # Changelog
 
-## [3.0.0](https://github.com/uphold/anonymizer/releases/tag/v3.0.0) (2020-05-19)
+## [3.1.0](https://github.com/uphold/anonymizer/releases/tag/v3.1.0) (2020-10-22)
+- Bump node-fetch from 2.6.0 to 2.6.1 [\#34](https://github.com/uphold/anonymizer/pull/34) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump handlebars from 4.1.2 to 4.7.6 [\#33](https://github.com/uphold/anonymizer/pull/33) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump lodash from 4.17.15 to 4.17.19 [\#32](https://github.com/uphold/anonymizer/pull/32) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump https-proxy-agent from 2.2.2 to 2.2.4 [\#28](https://github.com/uphold/anonymizer/pull/28) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump acorn from 5.7.3 to 5.7.4 [\#26](https://github.com/uphold/anonymizer/pull/26) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add replacement customizer function [\#35](https://github.com/uphold/anonymizer/pull/35) ([nunofgs](https://github.com/nunofgs))
+
+## [v3.0.0](https://github.com/uphold/anonymizer/releases/tag/v3.0.0) (2020-05-19)
 - Add a blacklist with higher priority than whitelist [\#31](https://github.com/uphold/anonymizer/pull/31) ([adisney-up](https://github.com/adisney-up))
 - Add instructions to release new versions of the project [\#20](https://github.com/uphold/anonymizer/pull/20) ([waldyrious](https://github.com/waldyrious))
 - Replace travis with github test action [\#30](https://github.com/uphold/anonymizer/pull/30) ([nunofgs](https://github.com/nunofgs))
