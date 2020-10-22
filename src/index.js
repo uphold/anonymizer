@@ -11,13 +11,13 @@ const traverse = require('traverse');
  * Constants.
  */
 
-const replacement = '--REDACTED--';
+const DEFAULT_REPLACEMENT = '--REDACTED--';
 
 /**
  * Module exports.
  */
 
-module.exports = ({ blacklist = [], whitelist = [] } = {}) => {
+module.exports = ({ blacklist = [], whitelist = [] } = {}, { replacement = () => DEFAULT_REPLACEMENT } = {}) => {
   const whitelistTerms = whitelist.join('|');
   const whitelistPaths = new RegExp(`^(${whitelistTerms.replace('.', '\\.').replace(/\*/g, '.*')})$`, 'i');
   const blacklistTerms = blacklist.join('|');
@@ -42,8 +42,10 @@ module.exports = ({ blacklist = [], whitelist = [] } = {}) => {
         return this.update(this.node, true);
       }
 
+      const replacedValue = replacement(this.key, this.node, this.path);
+
       if (blacklistPaths.test(path) || !whitelistPaths.test(path)) {
-        this.update(replacement);
+        this.update(replacedValue);
       }
     });
 

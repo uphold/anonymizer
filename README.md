@@ -4,6 +4,9 @@ Object redaction with whitelist and blacklist. Blacklist items have higher prior
 ## Arguments
 1. `whitelist` _(Array)_: The whitelist array.
 2. `blacklist` _(Array)_: The blacklist array.
+3. `options` _(Object)_: An object with optional options.
+
+    `options.replacement` _(Function)_: A function that allows customizing the replacement value (default implementation is `--REDACTED--`).
 
 ### Example
 
