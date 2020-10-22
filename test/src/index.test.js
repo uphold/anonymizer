@@ -199,5 +199,30 @@ describe('Anonymizer', () => {
         });
       });
     });
+
+    describe('replacement', () => {
+      it('should return the default replacement', () => {
+        const anonymize = anonymizer();
+
+        expect(anonymize({ foo: 'bar' })).toEqual({ foo: '--REDACTED--' });
+      });
+
+      it('should accept a customizer function', () => {
+        const replacement = (key, value) => {
+          const url = new URL(value);
+
+          for (const [search] of url.searchParams) {
+            url.searchParams.set(search, '--REDACTED--');
+          }
+
+          return url.toString();
+        };
+        const anonymize = anonymizer({}, { replacement });
+
+        expect(anonymize({ foo: 'https://example.com/?secret=verysecret' })).toEqual({
+          foo: 'https://example.com/?secret=--REDACTED--'
+        });
+      });
+    });
   });
 });
