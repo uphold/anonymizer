@@ -4,7 +4,8 @@
  * Module dependencies.
  */
 
-const clone = require('clone');
+const get = require('lodash.get');
+const stringify = require('json-stringify-safe');
 const traverse = require('traverse');
 
 /**
@@ -24,22 +25,18 @@ module.exports = ({ blacklist = [], whitelist = [] } = {}, { replacement = () =>
   const blacklistPaths = new RegExp(`^(${blacklistTerms.replace('.', '\\.').replace(/\*/g, '.*')})$`, 'i');
 
   return values => {
-    const obj = clone(values);
+    const obj = JSON.parse(stringify(values));
 
     traverse(obj).forEach(function() {
-      if (this.circular) {
-        return '[Circular ~]';
-      }
-
       const path = this.path.join('.');
-      const isBuffer = this.node instanceof Buffer;
+      const isBuffer = Buffer.isBuffer(get(values, path));
 
       if (!isBuffer && !this.isLeaf) {
         return;
       }
 
       if (isBuffer && (!blacklistPaths.test(path) && whitelistPaths.test(path))) {
-        return this.update(this.node, true);
+        return this.update(Buffer.from(this.node), true);
       }
 
       const replacedValue = replacement(this.key, this.node, this.path);
