@@ -1,6 +1,9 @@
 # Changelog
 
-## [3.1.0](https://github.com/uphold/anonymizer/releases/tag/v3.1.0) (2020-10-22)
+## [3.1.1](https://github.com/uphold/anonymizer/releases/tag/v3.1.1) (2020-11-18)
+- Fix obfuscation of class getter methods [\#36](https://github.com/uphold/anonymizer/pull/36) ([nunofgs](https://github.com/nunofgs))
+
+## [v3.1.0](https://github.com/uphold/anonymizer/releases/tag/v3.1.0) (2020-10-22)
 - Bump node-fetch from 2.6.0 to 2.6.1 [\#34](https://github.com/uphold/anonymizer/pull/34) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump handlebars from 4.1.2 to 4.7.6 [\#33](https://github.com/uphold/anonymizer/pull/33) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump lodash from 4.17.15 to 4.17.19 [\#32](https://github.com/uphold/anonymizer/pull/32) ([dependabot[bot]](https://github.com/apps/dependabot))
