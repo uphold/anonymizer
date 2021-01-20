@@ -125,10 +125,10 @@ describe('Anonymizer', () => {
       });
 
       it('should allow using `*` in the whitelist path', () => {
-        const anonymize = anonymizer({ whitelist: ['*.foo', '*.foobar'] });
+        const anonymize = anonymizer({ whitelist: ['*.foo', '*.foobar', 'parent.*.biz'] });
 
-        expect(anonymize({ parent: { foo: 'bar', foobar: 'foobiz' } })).toEqual({
-          parent: { foo: 'bar', foobar: 'foobiz' }
+        expect(anonymize({ parent: { foo: 'bar', foobar: 'foobiz', quux: { biz: 'baz', foobiz: 'bar' } } })).toEqual({
+          parent: { foo: 'bar', foobar: 'foobiz', quux: { biz: 'baz', foobiz: '--REDACTED--' } }
         });
       });
     });
