@@ -20,9 +20,9 @@ const DEFAULT_REPLACEMENT = '--REDACTED--';
 
 module.exports = ({ blacklist = [], whitelist = [] } = {}, { replacement = () => DEFAULT_REPLACEMENT } = {}) => {
   const whitelistTerms = whitelist.join('|');
-  const whitelistPaths = new RegExp(`^(${whitelistTerms.replace('.', '\\.').replace(/\*/g, '.*')})$`, 'i');
+  const whitelistPaths = new RegExp(`^(${whitelistTerms.replace(/\./g, '\\.').replace(/\*/g, '.*')})$`, 'i');
   const blacklistTerms = blacklist.join('|');
-  const blacklistPaths = new RegExp(`^(${blacklistTerms.replace('.', '\\.').replace(/\*/g, '.*')})$`, 'i');
+  const blacklistPaths = new RegExp(`^(${blacklistTerms.replace(/\./g, '\\.').replace(/\*/g, '.*')})$`, 'i');
 
   return values => {
     const obj = JSON.parse(stringify(values));
