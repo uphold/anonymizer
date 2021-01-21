@@ -1,6 +1,9 @@
 # Changelog
 
-## [3.1.1](https://github.com/uphold/anonymizer/releases/tag/v3.1.1) (2020-11-18)
+## [4.0.0](https://github.com/uphold/anonymizer/releases/tag/v4.0.0) (2021-01-21)
+- Improve handling of wildcard character [\#38](https://github.com/uphold/anonymizer/pull/38) ([franciscocardoso](https://github.com/franciscocardoso))
+
+## [v3.1.1](https://github.com/uphold/anonymizer/releases/tag/v3.1.1) (2020-11-18)
 - Fix obfuscation of class getter methods [\#36](https://github.com/uphold/anonymizer/pull/36) ([nunofgs](https://github.com/nunofgs))
 
 ## [v3.1.0](https://github.com/uphold/anonymizer/releases/tag/v3.1.0) (2020-10-22)
