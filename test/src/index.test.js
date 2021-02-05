@@ -12,7 +12,7 @@ const anonymizer = require('src');
 
 describe('Anonymizer', () => {
   describe('anonymize', () => {
-    it('should allow circular references', () => {
+    it.skip('should allow circular references', () => {
       const object = {};
 
       object.reference = object;
