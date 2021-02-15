@@ -250,5 +250,23 @@ describe('Anonymizer', () => {
         });
       });
     });
+
+    describe('trim', () => {
+      it('should trim obfuscated fields and add their paths to a `__redacted__` list', () => {
+        const anonymize = anonymizer({ whitelist: ['foo'] }, { trim: true });
+
+        expect(
+          anonymize({
+            biz: 'baz',
+            buz: { qux: 'quux' },
+            foo: 'bar'
+          })
+        ).toEqual({
+          __redacted__: ['biz', 'buz.qux'],
+          buz: {},
+          foo: 'bar'
+        });
+      });
+    });
   });
 });
