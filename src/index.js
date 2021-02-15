@@ -18,7 +18,10 @@ const DEFAULT_REPLACEMENT = '--REDACTED--';
  * Module exports.
  */
 
-module.exports = ({ blacklist = [], whitelist = [] } = {}, { replacement = () => DEFAULT_REPLACEMENT } = {}) => {
+module.exports = (
+  { blacklist = [], whitelist = [] } = {},
+  { replacement = () => DEFAULT_REPLACEMENT, trim = false } = {}
+) => {
   const whitelistTerms = whitelist.join('|');
   const whitelistPaths = new RegExp(`^(${whitelistTerms.replace(/\./g, '\\.').replace(/\*/g, '.*')})$`, 'i');
   const blacklistTerms = blacklist.join('|');
@@ -29,6 +32,7 @@ module.exports = ({ blacklist = [], whitelist = [] } = {}, { replacement = () =>
       return values;
     }
 
+    const blacklistedKeys = [];
     const obj = JSON.parse(stringify(values));
 
     traverse(obj).forEach(function() {
@@ -43,12 +47,25 @@ module.exports = ({ blacklist = [], whitelist = [] } = {}, { replacement = () =>
         return this.update(Buffer.from(this.node), true);
       }
 
+      if (trim) {
+        if (blacklistPaths.test(path) || !whitelistPaths.test(path)) {
+          blacklistedKeys.push(this.path.join('.'));
+
+          return this.update(undefined, true);
+        }
+      }
+
       const replacedValue = replacement(this.key, this.node, this.path);
 
       if (blacklistPaths.test(path) || !whitelistPaths.test(path)) {
         this.update(replacedValue);
       }
     });
+
+    if (blacklistedKeys.length) {
+      // eslint-disable-next-line no-underscore-dangle
+      obj.__redacted__ = blacklistedKeys;
+    }
 
     return obj;
   };
