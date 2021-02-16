@@ -25,6 +25,10 @@ module.exports = ({ blacklist = [], whitelist = [] } = {}, { replacement = () =>
   const blacklistPaths = new RegExp(`^(${blacklistTerms.replace(/\./g, '\\.').replace(/\*/g, '.*')})$`, 'i');
 
   return values => {
+    if (!(values instanceof Object)) {
+      return values;
+    }
+
     const obj = JSON.parse(stringify(values));
 
     traverse(obj).forEach(function() {
