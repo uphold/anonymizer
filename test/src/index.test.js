@@ -12,6 +12,13 @@ const anonymizer = require('src');
 
 describe('Anonymizer', () => {
   describe('anonymize', () => {
+    it('should not traverse and obfuscate values that are not objects', () => {
+      const anonymize = anonymizer({ whitelist: ['foo'] });
+      const text = JSON.stringify({ foo: 'bar', qux: 'biz' });
+
+      expect(anonymize(text)).toEqual(text);
+    });
+
     it('should allow circular references', () => {
       const object = {};
 
