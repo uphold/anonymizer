@@ -39,6 +39,14 @@ module.exports = (
       const path = this.path.join('.');
       const isBuffer = Buffer.isBuffer(get(values, path));
 
+      if (trim) {
+        this.after(function(node) {
+          if (!this.isLeaf && Object.values(node).every(value => value === undefined)) {
+            return this.isRoot ? this.update(undefined, true) : this.delete();
+          }
+        });
+      }
+
       if (!isBuffer && !this.isLeaf) {
         return;
       }
@@ -51,7 +59,7 @@ module.exports = (
         if (blacklistPaths.test(path) || !whitelistPaths.test(path)) {
           blacklistedKeys.push(this.path.join('.'));
 
-          return this.update(undefined, true);
+          return this.isRoot ? this.update(undefined, true) : this.delete();
         }
       }
 

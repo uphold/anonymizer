@@ -258,12 +258,11 @@ describe('Anonymizer', () => {
         expect(
           anonymize({
             biz: 'baz',
-            buz: { qux: 'quux' },
+            buz: { bux: { qux: 'quux' } },
             foo: 'bar'
           })
         ).toEqual({
-          __redacted__: ['biz', 'buz.qux'],
-          buz: {},
+          __redacted__: ['biz', 'buz.bux.qux'],
           foo: 'bar'
         });
       });
