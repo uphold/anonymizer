@@ -55,17 +55,15 @@ module.exports = (
         return this.update(Buffer.from(this.node), true);
       }
 
-      if (trim) {
-        if (blacklistPaths.test(path) || !whitelistPaths.test(path)) {
+      const replacedValue = replacement(this.key, this.node, this.path);
+
+      if (blacklistPaths.test(path) || !whitelistPaths.test(path)) {
+        if (trim && replacedValue === DEFAULT_REPLACEMENT) {
           blacklistedKeys.push(this.path.join('.'));
 
           return this.isRoot ? this.update(undefined, true) : this.delete();
         }
-      }
 
-      const replacedValue = replacement(this.key, this.node, this.path);
-
-      if (blacklistPaths.test(path) || !whitelistPaths.test(path)) {
         this.update(replacedValue);
       }
     });
