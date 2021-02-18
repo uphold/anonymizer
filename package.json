@@ -1,6 +1,6 @@
 {
   "name": "@uphold/anonymizer",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "description": "Object redaction with whitelist as main feature.",
   "homepage": "https://github.com/uphold/anonymizer#readme",
   "bugs": {
