@@ -7,6 +7,8 @@ Object redaction with whitelist and blacklist. Blacklist items have higher prior
 3. `options` _(Object)_: An object with optional options.
 
     `options.replacement` _(Function)_: A function that allows customizing the replacement value (default implementation is `--REDACTED--`).
+    
+    `options.trim` _(Boolean)_: A flag that enables trimming all redacted values, saving their keys to a `__redacted__` list (default value is `false`).
 
 ### Example
 
