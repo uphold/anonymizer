@@ -1,6 +1,10 @@
 # Changelog
 
-## [4.1.0](https://github.com/uphold/anonymizer/releases/tag/v4.1.0) (2021-02-17)
+## [4.1.1](https://github.com/uphold/anonymizer/releases/tag/v4.1.1) (2021-02-18)
+- Update readme to include trim option [\#42](https://github.com/uphold/anonymizer/pull/42) ([rplopes](https://github.com/rplopes))
+- Trim objects with no unredacted values [\#41](https://github.com/uphold/anonymizer/pull/41) ([rplopes](https://github.com/rplopes))
+
+## [v4.1.0](https://github.com/uphold/anonymizer/releases/tag/v4.1.0) (2021-02-17)
 - Trim redacted keys [\#39](https://github.com/uphold/anonymizer/pull/39) ([rplopes](https://github.com/rplopes))
 - Apply anonymizer to objects only [\#40](https://github.com/uphold/anonymizer/pull/40) ([rplopes](https://github.com/rplopes))
 
