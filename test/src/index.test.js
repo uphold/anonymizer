@@ -266,6 +266,35 @@ describe('Anonymizer', () => {
           foo: 'bar'
         });
       });
+
+      it('should not trim obfuscated values that have different obfuscation techniques', () => {
+        const replacement = (key, value) => {
+          if (key === 'biz') {
+            return value;
+          }
+
+          if (value === 'bux') {
+            return '--HIDDEN--';
+          }
+
+          return '--REDACTED--';
+        };
+        const anonymize = anonymizer({ whitelist: ['foo'] }, { replacement, trim: true });
+
+        expect(
+          anonymize({
+            biz: 'baz',
+            buz: 'bux',
+            foo: 'bar',
+            qux: 'quux'
+          })
+        ).toEqual({
+          __redacted__: ['qux'],
+          biz: 'baz',
+          buz: '--HIDDEN--',
+          foo: 'bar'
+        });
+      });
     });
   });
 });
