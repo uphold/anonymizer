@@ -24,6 +24,7 @@
     "traverse": "^0.6.6"
   },
   "devDependencies": {
+    "benny": "^3.6.15",
     "uphold-scripts": "^0.4.0"
   },
   "pre-commit": [
