@@ -43,9 +43,9 @@ describe('Anonymizer', () => {
       }
 
       const anonymize = anonymizer({ whitelist: ['foo.bar'] });
-      const foo = new Foobar();
+      const foo = { foo: new Foobar() };
 
-      expect(anonymize({ foo })).toEqual({ foo: { bar: 'biz' } });
+      expect(anonymize(foo)).toEqual({ foo: { bar: 'biz' } });
     });
 
     describe('whitelist', () => {
@@ -82,8 +82,9 @@ describe('Anonymizer', () => {
 
       it(`should not obfuscate Buffer-type keys that are whitelisted`, () => {
         const anonymize = anonymizer({ whitelist: ['foo'] });
+        const obj = { foo: Buffer.from('foobarfoobar') };
 
-        expect(anonymize({ foo: Buffer.from('foobarfoobar') })).toEqual({ foo: Buffer.from('foobarfoobar') });
+        expect(anonymize(obj)).toEqual({ foo: Buffer.from('foobarfoobar') });
       });
 
       it(`should default to an empty whitelist`, () => {

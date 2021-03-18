@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "lodash.get": "^4.4.2",
+    "lodash.set": "^4.3.2",
     "traverse": "^0.6.6"
   },
   "devDependencies": {
