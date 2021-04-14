@@ -252,6 +252,20 @@ describe('Anonymizer', () => {
     });
 
     describe('trim', () => {
+      it('should group array keys', () => {
+        const anonymize = anonymizer({ whitelist: ['foo'] }, { trim: true });
+
+        expect(
+          anonymize({
+            buz: [{ biz: 'baz' }, { biz: 'biz' }, { bar: 'foo', biz: 'boz' }],
+            foo: 'bar'
+          })
+        ).toEqual({
+          __redacted__: ['buz.[].biz', 'buz.[].bar'],
+          foo: 'bar'
+        });
+      });
+
       it('should trim obfuscated fields and add their paths to a `__redacted__` list', () => {
         const anonymize = anonymizer({ whitelist: ['foo'] }, { trim: true });
 
