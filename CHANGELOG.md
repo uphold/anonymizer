@@ -1,6 +1,9 @@
 # Changelog
 
-## [4.1.2](https://github.com/uphold/anonymizer/releases/tag/v4.1.2) (2021-02-18)
+## [4.2.0](https://github.com/uphold/anonymizer/releases/tag/v4.2.0) (2021-04-14)
+- Group trimmed array keys [\#44](https://github.com/uphold/anonymizer/pull/44) ([nunofgs](https://github.com/nunofgs))
+
+## [v4.1.2](https://github.com/uphold/anonymizer/releases/tag/v4.1.2) (2021-02-18)
 - Avoid trimming obfuscated values with different obfuscation techniques [\#43](https://github.com/uphold/anonymizer/pull/43) ([rplopes](https://github.com/rplopes))
 
 ## [v4.1.1](https://github.com/uphold/anonymizer/releases/tag/v4.1.1) (2021-02-18)
