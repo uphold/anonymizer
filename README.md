@@ -10,9 +10,13 @@ Object redaction with whitelist and blacklist. Blacklist items have higher prior
 
     `options.serializers` _(List[Object])_: A list with serializers to apply. Each serializers must contain two properties: `path` (path for the value to be serialized, must be a `string`) and `serializer` (function to be called on the path's value).
 
-    `options.trim` _(Boolean)_: A flag that enables trimming all redacted values, saving their keys to a `__redacted__` list (default value is `false`).
+    `options.strategy` _(string)_: An option that specifies the trimming strategy. Should be one of the following:
+     * `redact` is the default behavior and obfuscates the values without removing the redacted ones.
+     * `trim` removes the redacted values from the output.
+     * `trim-and-list` removes and adds a list with all deleted paths.
 
-### Example
+### Examples
+#### Example using `redact` as strategy
 
 ```js
 const { anonymizer } = require('@uphold/anonymizer');
@@ -37,9 +41,69 @@ anonymize(data);
 //   },
 //   bar: { foo: 1, bar: 2 },
 //   toAnonymize: { baz: '--REDACTED--', bar: '--REDACTED--' },
-//   toAnonymizeSuperString: '--REDACTED--'
+//   toAnonymizeSuperString: 'foo'
 // }
 ```
+#### Example using `trim` as strategy
+
+```js
+const { anonymizer } = require('@uphold/anonymizer');
+const whitelist = ['foo.key', 'foo.depth.*', 'bar.*', 'toAnonymize.baz', 'toAnonymizeSuperString'];
+const blacklist = ['foo.depth.innerBlacklist', 'toAnonymize.*'];
+const anonymize = anonymizer({ blacklist, whitelist }, { strategy: 'trim' });
+
+const data = {
+  foo: { key: 'public', another: 'bar', depth: { bar: 10, innerBlacklist: 11 } },
+  bar: { foo: 1, bar: 2 },
+  toAnonymize: { baz: 11, bar: 12 },
+  toAnonymizeSuperString: 'foo'
+};
+
+anonymize(data);
+
+// {
+//   foo: {
+//     key: 'public',
+//     depth: { bar: 10 }
+//   },
+//   bar: { foo: 1, bar: 2 },
+//   toAnonymizeSuperString: 'foo'
+// }
+```
+
+#### Example using `trim-and-list` as strategy
+
+```js
+const { anonymizer } = require('@uphold/anonymizer');
+const whitelist = ['foo.key', 'foo.depth.*', 'bar.*', 'toAnonymize.baz', 'toAnonymizeSuperString'];
+const blacklist = ['foo.depth.innerBlacklist', 'toAnonymize.*'];
+const anonymize = anonymizer({ blacklist, whitelist }, { strategy: 'trim-and-list' });
+
+const data = {
+  foo: { key: 'public', another: 'bar', depth: { bar: 10, innerBlacklist: 11 } },
+  bar: { foo: 1, bar: 2 },
+  toAnonymize: { baz: 11, bar: 12 },
+  toAnonymizeSuperString: 'foo'
+};
+
+anonymize(data);
+
+// {
+//   foo: {
+//     key: 'public',
+//     depth: { bar: 10 }
+//   },
+//   bar: { foo: 1, bar: 2 },
+//   toAnonymizeSuperString: 'foo',
+//   __redacted__: [
+//     'foo.another',
+//     'foo.depth.innerBlacklist',
+//     'toAnonymize.baz',
+//     'toAnonymize.bar'
+//   ]
+// }
+```
+
 
 #### Example using serializers
 
