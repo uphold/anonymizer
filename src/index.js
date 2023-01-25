@@ -5,6 +5,7 @@
  */
 
 const { serializeError } = require('serialize-error');
+const { strategies } = require('./enums');
 const cloneDeepWith = require('lodash.clonedeepwith');
 const isError = require('lodash.iserror');
 const get = require('lodash.get');
@@ -16,6 +17,7 @@ const traverse = require('traverse');
  * Constants.
  */
 
+const { REDACT, TRIM, TRIM_AND_LIST } = strategies;
 const DEFAULT_REPLACEMENT = '--REDACTED--';
 
 /**
@@ -102,12 +104,17 @@ function parseAndSerialize(values, serializers) {
 
 module.exports.anonymizer = (
   { blacklist = [], whitelist = [] } = {},
-  { replacement = () => DEFAULT_REPLACEMENT, serializers = [], trim = false } = {}
+  { replacement = () => DEFAULT_REPLACEMENT, serializers = [], strategy = REDACT } = {}
 ) => {
+  if (!Object.values(strategies).includes(strategy)) {
+    throw new Error(`Strategy ${strategy} not supported. Choose one from [${Object.values(strategies).join(', ')}]`);
+  }
+
   const whitelistTerms = whitelist.join('|');
   const whitelistPaths = new RegExp(`^(${whitelistTerms.replace(/\./g, '\\.').replace(/\*/g, '.*')})$`, 'i');
   const blacklistTerms = blacklist.join('|');
   const blacklistPaths = new RegExp(`^(${blacklistTerms.replace(/\./g, '\\.').replace(/\*/g, '.*')})$`, 'i');
+  const trim = [TRIM, TRIM_AND_LIST].includes(strategy);
 
   validateSerializers(serializers);
 
@@ -154,7 +161,7 @@ module.exports.anonymizer = (
       }
     });
 
-    if (blacklistedKeys.size) {
+    if (strategy === TRIM_AND_LIST && blacklistedKeys.size) {
       // eslint-disable-next-line no-underscore-dangle
       obj.__redacted__ = Array.from(blacklistedKeys);
     }

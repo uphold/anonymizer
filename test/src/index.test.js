@@ -7,6 +7,13 @@
 const { anonymizer } = require('src');
 const { generateObjectSample, generateObjectSamplePaths } = require('./benchmark/samples');
 const { serializeError } = require('serialize-error');
+const { strategies } = require('src/enums');
+
+/**
+ * Constants.
+ */
+
+const { TRIM, TRIM_AND_LIST } = strategies;
 
 /**
  * Test `Anonymizer`.
@@ -368,9 +375,37 @@ describe('Anonymizer', () => {
       });
     });
 
-    describe('trim', () => {
+    describe('strategy', () => {
+      it('should throw an error if strategy is not supported', () => {
+        try {
+          anonymizer({ whitelist: ['*'] }, { strategy: 'foobar' });
+
+          fail();
+        } catch (error) {
+          expect(error).toBeInstanceOf(Error);
+          expect(error.message).toEqual(
+            `Strategy foobar not supported. Choose one from [${Object.values(strategies).join(', ')}]`
+          );
+        }
+      });
+
+      it('should use `REDACT` as default strategy', () => {
+        const anonymize = anonymizer({ whitelist: ['foo*'] });
+        const result = anonymize({
+          buz: 'baz',
+          foo: { bar: 'bar', biz: 'biz' },
+          foz: { baz: 'baz' }
+        });
+
+        expect(result).toEqual({
+          buz: '--REDACTED--',
+          foo: { bar: 'bar', biz: 'biz' },
+          foz: { baz: '--REDACTED--' }
+        });
+      });
+
       it('should group array keys', () => {
-        const anonymize = anonymizer({ whitelist: ['foo'] }, { trim: true });
+        const anonymize = anonymizer({ whitelist: ['foo'] }, { strategy: TRIM_AND_LIST });
 
         expect(
           anonymize({
@@ -384,7 +419,7 @@ describe('Anonymizer', () => {
       });
 
       it('should trim obfuscated fields and add their paths to a `__redacted__` list', () => {
-        const anonymize = anonymizer({ whitelist: ['foo'] }, { trim: true });
+        const anonymize = anonymizer({ whitelist: ['foo'] }, { strategy: TRIM_AND_LIST });
 
         expect(
           anonymize({
@@ -398,7 +433,21 @@ describe('Anonymizer', () => {
         });
       });
 
-      it('should not trim obfuscated values that have different obfuscation techniques', () => {
+      it('should trim obfuscated fields without adding their paths to a `__redacted__` list', () => {
+        const anonymize = anonymizer({ whitelist: ['foo'] }, { strategy: TRIM });
+
+        expect(
+          anonymize({
+            biz: 'baz',
+            buz: { bux: { qux: 'quux' } },
+            foo: 'bar'
+          })
+        ).toEqual({
+          foo: 'bar'
+        });
+      });
+
+      it(`should not trim obfuscated values if 'replacement' evaluated value is different from the default and strategy is ${TRIM}`, () => {
         const replacement = (key, value) => {
           if (key === 'biz') {
             return value;
@@ -410,7 +459,35 @@ describe('Anonymizer', () => {
 
           return '--REDACTED--';
         };
-        const anonymize = anonymizer({ whitelist: ['foo'] }, { replacement, trim: true });
+        const anonymize = anonymizer({ whitelist: ['foo'] }, { replacement, strategy: TRIM });
+
+        expect(
+          anonymize({
+            biz: 'baz',
+            buz: 'bux',
+            foo: 'bar',
+            qux: 'quux'
+          })
+        ).toEqual({
+          biz: 'baz',
+          buz: '--HIDDEN--',
+          foo: 'bar'
+        });
+      });
+
+      it(`should not trim obfuscated values if 'replacement' evaluated value is different from the default and strategy is ${TRIM_AND_LIST}`, () => {
+        const replacement = (key, value) => {
+          if (key === 'biz') {
+            return value;
+          }
+
+          if (value === 'bux') {
+            return '--HIDDEN--';
+          }
+
+          return '--REDACTED--';
+        };
+        const anonymize = anonymizer({ whitelist: ['foo'] }, { replacement, strategy: TRIM_AND_LIST });
 
         expect(
           anonymize({
@@ -475,6 +552,25 @@ describe('Anonymizer', () => {
 
         expect(msElapsed).toBeLessThan(175);
         expect(serializer).toHaveBeenCalledTimes(32768);
+      });
+
+      [TRIM, TRIM_AND_LIST].forEach(strategy => {
+        it(`should run in '${strategy}' mode with an object with '32768' properties in less than '225' ms`, () => {
+          const depth = 10;
+          const data = generateObjectSample({ depth });
+          const serializer = jest.fn(() => 'bii');
+          const serializers = generateObjectSamplePaths({ depth }).map(path => ({ path, serializer }));
+          const anonymize = anonymizer({ blacklist: ['*'] }, { serializers, strategy });
+          const startTime = process.hrtime();
+
+          anonymize(data);
+
+          const endTime = process.hrtime(startTime);
+          const msElapsed = endTime[1] / 1000000;
+
+          expect(msElapsed).toBeLessThan(225);
+          expect(serializer).toHaveBeenCalledTimes(32768);
+        });
       });
     });
   });
