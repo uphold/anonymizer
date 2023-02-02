@@ -4,8 +4,8 @@
  * Module dependencies.
  */
 
+const { stringify } = require('safe-stable-stringify');
 const get = require('lodash.get');
-const stringify = require('json-stringify-safe');
 const traverse = require('traverse');
 
 /**

@@ -26,7 +26,7 @@ describe('Anonymizer', () => {
 
       const anonymize = anonymizer({ whitelist: ['*'] });
 
-      expect(anonymize(object)).toEqual({ reference: '[Circular ~]' });
+      expect(anonymize(object)).toEqual({ reference: '[Circular]' });
     });
 
     it('should obfuscate class getters', () => {
