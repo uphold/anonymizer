@@ -111,7 +111,7 @@ module.exports.anonymizer = (
 
       if (blacklistPaths.test(path) || !whitelistPaths.test(path)) {
         if (trim && replacedValue === DEFAULT_REPLACEMENT) {
-          const path = this.path.map(value => (isNaN(value) ? value : '[]'));
+          const path = this.path.map(value => { return isNaN(value) ? value : '[]'; });
 
           blacklistedKeys.add(path.join('.'));
 

@@ -1,1 +1,117 @@
 extends: uphold
+
+rules:
+  id-match: 0
+  no-underscore-dangle: 0
+
+  # Disable prettier.
+  prettier/prettier: 0
+
+  # These can be removed once prettier is enabled.
+  array-bracket-spacing:
+    - error
+  arrow-parens:
+    - error
+    - as-needed
+  arrow-spacing:
+    - error
+  brace-style:
+    - error
+    - 1tbs
+    - allowSingleLine: true
+  comma-dangle:
+    - error
+  comma-spacing:
+    - error
+  comma-style:
+    - error
+  computed-property-spacing:
+    - error
+  dot-location:
+    - error
+    - property
+  eol-last:
+    - error
+  generator-star-spacing:
+    - error
+    - before
+  indent:
+    - error
+    - 2
+    - SwitchCase: 1
+  key-spacing:
+    - error
+  keyword-spacing:
+    - error
+  linebreak-style:
+    - error
+  new-parens:
+    - error
+  no-confusing-arrow:
+    - error
+  no-extra-parens:
+    - error
+  no-floating-decimal:
+    - error
+  no-multi-spaces:
+    - error
+  no-multiple-empty-lines:
+    - error
+    - max: 1
+  no-spaced-func:
+    - error
+  no-trailing-spaces:
+    - error
+  no-unexpected-multiline:
+    - error
+  object-curly-spacing:
+    - error
+    - always
+  one-var:
+    - error
+    - never
+  one-var-declaration-per-line:
+    - error
+    - always
+  operator-linebreak:
+    - error
+    - none
+  padded-blocks:
+    - error
+    - never
+  prefer-arrow-callback:
+    - error
+  prefer-destructuring:
+    - error
+  quote-props:
+    - error
+    - as-needed
+  quotes:
+    - error
+    - single
+    - allowTemplateLiterals: true
+  semi:
+    - error
+  semi-spacing:
+    - error
+  sort-keys-fix/sort-keys-fix:
+    - error
+    - asc
+    - natural: true
+  space-before-blocks:
+    - error
+  space-before-function-paren:
+    - error
+    - anonymous: never
+      named: never
+  space-in-parens:
+    - error
+  space-infix-ops:
+    - error
+  space-unary-ops:
+    - error
+  template-curly-spacing:
+    - error
+  wrap-iife:
+    - error
+    - inside
