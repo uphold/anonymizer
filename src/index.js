@@ -102,7 +102,7 @@ function parseAndSerialize(values, serializers) {
 
       set(target, path, serializer(copy));
     } catch (error) {
-      set(target, path, `Anonymize ERROR: Error while applying ${path} serializer`);
+      set(target, path, `Anonymize ERROR: Error while applying serializer`);
     }
   }
 
