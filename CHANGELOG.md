@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.0.0](https://github.com/uphold/anonymizer/releases/tag/v5.0.0) (2023-07-11)
+- Add support for serializers [\#64](https://github.com/uphold/anonymizer/pull/64) ([Dakrs](https://github.com/Dakrs))
+- Bump uphold-scripts and node on ci workflow [\#67](https://github.com/uphold/anonymizer/pull/67) ([cristianooliveira](https://github.com/cristianooliveira))
+
 ## [4.2.1](https://github.com/uphold/anonymizer/releases/tag/v4.2.1) (2022-01-12)
 - Add missing dependency on package.json [\#53](https://github.com/uphold/anonymizer/pull/53) ([ramms](https://github.com/ramms))
 
