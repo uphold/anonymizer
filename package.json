@@ -13,11 +13,9 @@
     "test": "test"
   },
   "scripts": {
-    "changelog": "uphold-scripts changelog $npm_package_version",
-    "lint": "uphold-scripts lint",
-    "release": "uphold-scripts release",
-    "test": "uphold-scripts test",
-    "version": "uphold-scripts version"
+    "lint": "uphold-scripts lint .",
+    "release": "release-it",
+    "test": "uphold-scripts test"
   },
   "dependencies": {
     "json-stringify-safe": "^5.0.1",
@@ -26,6 +24,8 @@
     "traverse": "^0.6.6"
   },
   "devDependencies": {
+    "@uphold/github-changelog-generator": "^3.4.0",
+    "release-it": "^17.0.1",
     "uphold-scripts": "^0.9.0"
   },
   "pre-commit": [
