@@ -5,10 +5,7 @@
  */
 
 const { serializeError } = require('serialize-error');
-const cloneDeep = require('lodash.clonedeep');
-const cloneDeepWith = require('lodash.clonedeepwith');
-const get = require('lodash.get');
-const set = require('lodash.set');
+const { cloneDeep, cloneDeepWith, get, set } = require('lodash');
 const stringify = require('json-stringify-safe');
 const traverse = require('traverse');
 
