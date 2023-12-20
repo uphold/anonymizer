@@ -1,5 +1,11 @@
 # Changelog
 
+## [v5.0.1](https://github.com/uphold/anonymizer/releases/tag/v5.0.1) (2023-12-20)
+- Add `publishConfig` to package.json [\#77](https://github.com/uphold/anonymizer/pull/77) ([satazor](https://github.com/satazor))
+- Fix publishing to npm as part of the release [\#74](https://github.com/uphold/anonymizer/pull/74) ([satazor](https://github.com/satazor))
+- Add GitHub release workflow [\#73](https://github.com/uphold/anonymizer/pull/73) ([diogotorres97](https://github.com/diogotorres97))
+- Fix memory leak on objects with variadic keys [\#72](https://github.com/uphold/anonymizer/pull/72) ([satazor](https://github.com/satazor))
+
 ## [5.0.0](https://github.com/uphold/anonymizer/releases/tag/v5.0.0) (2023-07-11)
 - Add support for serializers [\#64](https://github.com/uphold/anonymizer/pull/64) ([Dakrs](https://github.com/Dakrs))
 - Bump uphold-scripts and node on ci workflow [\#67](https://github.com/uphold/anonymizer/pull/67) ([cristianooliveira](https://github.com/cristianooliveira))
