@@ -12,6 +12,9 @@
   "directories": {
     "test": "test"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "lint": "uphold-scripts lint .",
     "release": "release-it",
