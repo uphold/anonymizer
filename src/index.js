@@ -4,8 +4,8 @@
  * Module dependencies.
  */
 
-const { serializeError } = require('serialize-error');
 const { cloneDeep, cloneDeepWith, get, set } = require('lodash');
+const { serializeError } = require('serialize-error');
 const stringify = require('json-stringify-safe');
 const traverse = require('traverse');
 
@@ -129,12 +129,12 @@ module.exports.anonymizer = (
     const blacklistedKeys = new Set();
     const obj = parseAndSerialize(values, serializers);
 
-    traverse(obj).forEach(function() {
+    traverse(obj).forEach(function () {
       const path = this.path.join('.');
       const isBuffer = Buffer.isBuffer(get(values, path));
 
       if (trim) {
-        this.after(function(node) {
+        this.after(function (node) {
           if (!this.isLeaf && Object.values(node).every(value => value === undefined)) {
             return this.isRoot ? this.update(undefined, true) : this.delete();
           }

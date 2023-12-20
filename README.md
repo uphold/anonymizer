@@ -100,20 +100,9 @@ anonymize(data);
 // }
 ```
 
-## Releasing a new version
+## Release process
 
-- Diff the current code with the latest tag and make sure the output is expected.
-
-  ```sh
-  git diff $(git describe --tags `git rev-list --tags --max-count=1`)..master
-  ```
-
-- Create a release commit and tag using [semver](http://semver.org) standards, and push them.
-
-  ```sh
-  yarn release ["major" | "minor" | "patch" | <custom version number>]
-  git push origin master --tags
-  ```
+The release of a version is automated via the [release](https://github.com/uphold/anonymizer/.github/workflows/release.yml) GitHub workflow. Run it by clicking the "Run workflow" button.
 
 ## License
 

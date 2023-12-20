@@ -331,7 +331,10 @@ describe('Anonymizer', () => {
           return 'biz';
         });
         const whitelist = ['*'];
-        const serializers = [{ path: 'foo', serializer: foobar }, { path: 'foz', serializer: fozbar }];
+        const serializers = [
+          { path: 'foo', serializer: foobar },
+          { path: 'foz', serializer: fozbar }
+        ];
         const anonymize = anonymizer({ whitelist }, { serializers });
 
         const result = anonymize(data);
@@ -478,7 +481,10 @@ describe('Anonymizer', () => {
         const serializer = jest.fn(() => {
           throw new Error('foobar');
         });
-        const serializers = [{ path: 'foo', serializer }, { path: 'foz', serializer }];
+        const serializers = [
+          { path: 'foo', serializer },
+          { path: 'foz', serializer }
+        ];
         const whitelist = ['*'];
         const anonymize = anonymizer({ whitelist }, { serializers });
 
@@ -495,7 +501,11 @@ describe('Anonymizer', () => {
         it('should serialize errors when `serializeError()` is applied', () => {
           const error = new Error('foobar');
           const serializer = jest.fn(serializeError);
-          const serializers = [{ path: 'e', serializer }, { path: 'err', serializer }, { path: 'error', serializer }];
+          const serializers = [
+            { path: 'e', serializer },
+            { path: 'err', serializer },
+            { path: 'error', serializer }
+          ];
           const whitelist = ['*'];
           const anonymize = anonymizer({ whitelist }, { serializers });
 
@@ -530,7 +540,10 @@ describe('Anonymizer', () => {
         it('should serialize errors when `datadogSerializer()` is applied', () => {
           const error = new Error('foobar');
           const serializer = jest.fn(datadogSerializer);
-          const serializers = [{ path: 'err', serializer }, { path: 'error', serializer }];
+          const serializers = [
+            { path: 'err', serializer },
+            { path: 'error', serializer }
+          ];
           const whitelist = ['error.foo', 'error.kind', 'error.message', 'error.name', 'error.stack'];
           const anonymize = anonymizer({ whitelist }, { serializers });
 
