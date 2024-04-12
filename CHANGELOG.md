@@ -1,5 +1,8 @@
 # Changelog
 
+## [v5.0.2](https://github.com/uphold/anonymizer/releases/tag/v5.0.2) (2024-04-12)
+- Update dependencies [\#79](https://github.com/uphold/anonymizer/pull/79) ([Americas](https://github.com/Americas))
+
 ## [v5.0.1](https://github.com/uphold/anonymizer/releases/tag/v5.0.1) (2023-12-20)
 - Add `publishConfig` to package.json [\#77](https://github.com/uphold/anonymizer/pull/77) ([satazor](https://github.com/satazor))
 - Fix publishing to npm as part of the release [\#74](https://github.com/uphold/anonymizer/pull/74) ([satazor](https://github.com/satazor))
