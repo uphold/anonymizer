@@ -1,5 +1,10 @@
 # Changelog
 
+## [v5.1.0](https://github.com/uphold/anonymizer/releases/tag/v5.1.0) (2024-11-08)
+- Fix release git config [\#82](https://github.com/uphold/anonymizer/pull/82) ([Americas](https://github.com/Americas))
+- Fix yarn install on release script [\#81](https://github.com/uphold/anonymizer/pull/81) ([Americas](https://github.com/Americas))
+- Pin traverse@0.6.9 [\#80](https://github.com/uphold/anonymizer/pull/80) ([Americas](https://github.com/Americas))
+
 ## [v5.0.2](https://github.com/uphold/anonymizer/releases/tag/v5.0.2) (2024-04-12)
 - Update dependencies [\#79](https://github.com/uphold/anonymizer/pull/79) ([Americas](https://github.com/Americas))
 
