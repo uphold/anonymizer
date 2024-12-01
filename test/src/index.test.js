@@ -53,180 +53,418 @@ describe('Anonymizer', () => {
       expect(anonymize({ foo })).toEqual({ foo: { bar: 'biz' } });
     });
 
+    it('should obfuscate values whose type is Buffer', () => {
+      const anonymize = anonymizer();
+
+      expect(anonymize({ foo: Buffer.from('foobarfoobar') })).toEqual({ foo: '--REDACTED--' });
+    });
+
     describe('whitelist', () => {
-      const whitelist = ['key1', 'key2', 'key3'];
-
-      whitelist.forEach(key => {
-        it(`should not obfuscate \`${key}\``, () => {
-          const anonymize = anonymizer({ whitelist });
-
-          expect(anonymize({ [key]: 'foo' })).toEqual({ [key]: 'foo' });
-        });
-
-        it(`should not obfuscate \`${key}\` with different casing`, () => {
-          const anonymize = anonymizer({ whitelist });
-
-          expect(anonymize({ [key.toUpperCase()]: 'foo' })).toEqual({ [key.toUpperCase()]: 'foo' });
-          expect(anonymize({ [key.toLowerCase()]: 'foo' })).toEqual({ [key.toLowerCase()]: 'foo' });
-        });
-
-        it(`should obfuscate keys that contain \`${key}\``, () => {
-          const anonymize = anonymizer({ whitelist });
-
-          expect(anonymize({ [`${key}foo`]: 'bar' })).toEqual({ [`${key}foo`]: '--REDACTED--' });
-          expect(anonymize({ [`foo${key}`]: 'bar' })).toEqual({ [`foo${key}`]: '--REDACTED--' });
-          expect(anonymize({ [`foo${key}foo`]: 'bar' })).toEqual({ [`foo${key}foo`]: '--REDACTED--' });
-        });
-      });
-
-      it(`should obfuscate keys whose type is Buffer`, () => {
-        const anonymize = anonymizer();
-
-        expect(anonymize({ foo: Buffer.from('foobarfoobar') })).toEqual({ foo: '--REDACTED--' });
-      });
-
-      it(`should not obfuscate Buffer-type keys that are whitelisted`, () => {
-        const anonymize = anonymizer({ whitelist: ['foo'] });
-
-        expect(anonymize({ foo: Buffer.from('foobarfoobar') })).toEqual({ foo: Buffer.from('foobarfoobar') });
-      });
-
-      it(`should default to an empty whitelist`, () => {
+      it('should default to an empty whitelist', () => {
         const anonymize = anonymizer();
 
         expect(anonymize({ foo: 'foo' })).toEqual({ foo: '--REDACTED--' });
       });
 
-      it('should not obfuscate recursively the keys of an object that are part of the whitelist', () => {
-        const anonymize = anonymizer({ whitelist });
+      it('should not obfuscate keys that are whitelisted', () => {
+        const anonymize = anonymizer({ whitelist: ['key1', 'key2'] });
 
-        expect(
-          anonymize({
-            foo: {
-              bar: {
-                baz: { bax: [2, 3, { bax: 4, [whitelist[1]]: '5' }] },
-                [whitelist[0]]: 'foobar',
-                [whitelist[2]]: 'foobiz'
-              }
-            }
-          })
-        ).toEqual({
-          foo: {
-            bar: {
-              baz: { bax: ['--REDACTED--', '--REDACTED--', { bax: '--REDACTED--', [whitelist[1]]: '--REDACTED--' }] },
-              [whitelist[0]]: '--REDACTED--',
-              [whitelist[2]]: '--REDACTED--'
-            }
-          }
+        expect(anonymize({ key1: 'foo', key2: 'bar', key3: 'baz' })).toEqual({
+          key1: 'foo',
+          key2: 'bar',
+          key3: '--REDACTED--'
         });
       });
 
-      it('should not obfuscate a key that is part of the whitelist', () => {
+      it('should match in a case insensitive way', () => {
         const anonymize = anonymizer({ whitelist: ['foo'] });
 
-        expect(anonymize({ foo: 'bar' })).toEqual({ foo: 'bar' });
+        expect(anonymize({ FOO: 'foo' })).toEqual({ FOO: 'foo' });
       });
 
-      it('should not treat a `.` in the whitelist as a special character in the regexp', () => {
-        const anonymize = anonymizer({ whitelist: ['foo.bar'] });
+      it('should not obfuscate values of type Buffer that are whitelisted', () => {
+        const anonymize = anonymizer({ whitelist: ['foo'] });
 
-        expect(anonymize({ foo: { bar: 'biz' }, fooabar: 'foobiz' })).toEqual({
-          foo: { bar: 'biz' },
-          fooabar: '--REDACTED--'
+        expect(anonymize({ foo: Buffer.from('foobarfoobar') })).toEqual({ foo: Buffer.from('foobarfoobar') });
+      });
+
+      it('should escape special characters when building the regular expression', () => {
+        const anonymize = anonymizer({ whitelist: ['f+o^o$b?a[r'] });
+
+        expect(anonymize({ 'f+o^o$b?a[r': 'foo' })).toEqual({ 'f+o^o$b?a[r': 'foo' });
+      });
+
+      it('should support wildcard matching', () => {
+        const data = {
+          foo: 'bar',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: 'bar'
+          },
+          parent2: { bar: 'biz', foo: 'bar' }
+        };
+
+        expect(anonymizer({ whitelist: ['parent1.*'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: '--REDACTED--' },
+            foo: 'bar'
+          },
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+        });
+
+        expect(anonymizer({ whitelist: ['parent2.f*'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: '--REDACTED--' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: '--REDACTED--', foo: 'bar' }
+        });
+
+        expect(anonymizer({ whitelist: ['parent2.*o'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: '--REDACTED--' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: '--REDACTED--', foo: 'bar' }
+        });
+
+        expect(anonymizer({ whitelist: ['parent2.*o*'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: '--REDACTED--' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: '--REDACTED--', foo: 'bar' }
+        });
+
+        expect(anonymizer({ whitelist: ['*e*.*'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: '--REDACTED--' },
+            foo: 'bar'
+          },
+          parent2: { bar: 'biz', foo: 'bar' }
+        });
+
+        expect(anonymizer({ whitelist: ['parent1.*.foo'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: 'bar' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+        });
+
+        expect(anonymizer({ whitelist: ['*.foo'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: '--REDACTED--' },
+            foo: 'bar'
+          },
+          parent2: { bar: '--REDACTED--', foo: 'bar' }
+        });
+
+        expect(anonymizer({ whitelist: ['*t1.foo'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: '--REDACTED--' },
+            foo: 'bar'
+          },
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
         });
       });
 
-      it('should allow using `*` in the whitelist path', () => {
-        const anonymize = anonymizer({ whitelist: ['*.foo', '*.foobar', 'parent.*.biz'] });
+      it('should support double wildcard matching', () => {
+        const data = {
+          foo: 'bar',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: 'bar'
+          },
+          parent2: { bar: 'biz', foo: 'bar' }
+        };
 
-        expect(anonymize({ parent: { foo: 'bar', foobar: 'foobiz', quux: { biz: 'baz', foobiz: 'bar' } } })).toEqual({
-          parent: { foo: 'bar', foobar: 'foobiz', quux: { biz: 'baz', foobiz: '--REDACTED--' } }
+        expect(anonymizer({ whitelist: ['parent1.**'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: 'bar'
+          },
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+        });
+
+        expect(anonymizer({ whitelist: ['parent**'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: 'bar'
+          },
+          parent2: { bar: 'biz', foo: 'bar' }
+        });
+
+        expect(anonymizer({ whitelist: ['parent1.c**'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+        });
+
+        expect(anonymizer({ whitelist: ['parent1.**.foo'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: 'bar' },
+            foo: 'bar'
+          },
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+        });
+
+        expect(anonymizer({ whitelist: ['**.foo'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: 'bar' },
+            foo: 'bar'
+          },
+          parent2: { bar: '--REDACTED--', foo: 'bar' }
+        });
+
+        expect(anonymizer({ whitelist: ['**oo'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: 'bar' },
+            foo: 'bar'
+          },
+          parent2: { bar: '--REDACTED--', foo: 'bar' }
+        });
+
+        expect(anonymizer({ whitelist: ['**.oo'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: '--REDACTED--' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+        });
+
+        expect(anonymizer({ whitelist: ['**.fo'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: '--REDACTED--' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
         });
       });
     });
 
     describe('blacklist', () => {
-      it(`should default to an empty blacklist`, () => {
+      it('should default to an empty blacklist', () => {
         const anonymize = anonymizer({ whitelist: ['foo'] });
 
         expect(anonymize({ foo: 'foo' })).toEqual({ foo: 'foo' });
       });
 
-      it('should not treat a `.` in the blacklist as a special character in the regexp', () => {
-        const anonymize = anonymizer({ blacklist: ['foo.bar'], whitelist: ['fooabar'] });
+      it('should obfuscate keys that are blacklisted', () => {
+        const anonymize = anonymizer({ blacklist: ['key1', 'key2'], whitelist: ['**'] });
 
-        expect(anonymize({ foo: { bar: 'biz' }, fooabar: 'foobiz' })).toEqual({
-          foo: { bar: '--REDACTED--' },
-          fooabar: 'foobiz'
+        expect(anonymize({ key1: 'foo', key2: 'bar', key3: 'baz' })).toEqual({
+          key1: '--REDACTED--',
+          key2: '--REDACTED--',
+          key3: 'baz'
         });
       });
 
-      describe('in case of collision', () => {
-        it('should prioritize blacklist over whitelist', () => {
-          const anonymize = anonymizer({ blacklist: ['key1.innerKey1'], whitelist: ['key1.innerKey1'] });
+      it('should prioritize blacklist over whitelist', () => {
+        const anonymize = anonymizer({ blacklist: ['key1.innerKey1'], whitelist: ['key1.innerKey1'] });
 
-          expect(
-            anonymize({
-              key1: { innerKey1: 'bar', innerKey2: 'foo' }
-            })
-          ).toEqual({
-            key1: { innerKey1: '--REDACTED--', innerKey2: '--REDACTED--' }
-          });
+        expect(
+          anonymize({
+            key1: { innerKey1: 'bar', innerKey2: 'foo' }
+          })
+        ).toEqual({
+          key1: { innerKey1: '--REDACTED--', innerKey2: '--REDACTED--' }
+        });
+      });
+
+      it('should match in a case insensitive way', () => {
+        const anonymize = anonymizer({ blacklist: ['key1'], whitelist: ['KEy1'] });
+
+        expect(anonymize({ KEy1: 'foo' })).toEqual({ KEy1: '--REDACTED--' });
+      });
+
+      it('should escape special characters when building the regular expression', () => {
+        const anonymize = anonymizer({ blacklist: ['f+o^o$b?a[r'], whitelist: ['**'] });
+
+        expect(anonymize({ 'f+o^o$b?a[r': 'FOO' })).toEqual({ 'f+o^o$b?a[r': '--REDACTED--' });
+      });
+
+      it('should support wildcard matching', () => {
+        const data = {
+          foo: 'bar',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: 'bar'
+          },
+          parent2: { bar: 'biz', foo: 'bar' }
+        };
+
+        expect(anonymizer({ blacklist: ['parent1.*'], whitelist: ['**'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: 'biz', foo: 'bar' }
         });
 
-        it(`should obfuscate key with different casing`, () => {
-          const anonymize = anonymizer({ blacklist: ['key1'], whitelist: ['KEy1'] });
-
-          expect(anonymize({ KEy1: 'foo' })).toEqual({ KEy1: '--REDACTED--' });
+        expect(anonymizer({ blacklist: ['parent2.f*'], whitelist: ['**'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: 'bar'
+          },
+          parent2: { bar: 'biz', foo: '--REDACTED--' }
         });
 
-        it('should allow using `*` in blacklist path', () => {
-          const whitelist = ['key1.*', 'key2.innerKey2'];
-          const blacklist = ['*innerKey2'];
-          const anonymize = anonymizer({ blacklist, whitelist });
-
-          expect(
-            anonymize({
-              key1: { innerKey1: 'bar', innerKey2: 'bam' },
-              key2: { innerKey1: 'bar', innerKey2: 'bam' }
-            })
-          ).toEqual({
-            key1: { innerKey1: 'bar', innerKey2: '--REDACTED--' },
-            key2: { innerKey1: '--REDACTED--', innerKey2: '--REDACTED--' }
-          });
+        expect(anonymizer({ blacklist: ['parent2.*o'], whitelist: ['**'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: 'bar'
+          },
+          parent2: { bar: 'biz', foo: '--REDACTED--' }
         });
 
-        it(`should obfuscate Buffer-type keys that are blacklisted`, () => {
-          const anonymize = anonymizer({ blacklist: ['foo'], whitelist: ['foo'] });
-
-          expect(anonymize({ foo: Buffer.from('foobarfoobar') })).toEqual({ foo: '--REDACTED--' });
+        expect(anonymizer({ blacklist: ['parent2.*o*'], whitelist: ['**'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: 'bar'
+          },
+          parent2: { bar: 'biz', foo: '--REDACTED--' }
         });
 
-        it('should obfuscate recursively the keys of an object that are part of the blacklist', () => {
-          const anonymize = anonymizer({
-            blacklist: ['foo.bar.*'],
-            whitelist: ['foo.bar.key1', 'foo.bar.key2', 'foo.bar.baz.bax.*', '*key1']
-          });
+        expect(anonymizer({ blacklist: ['*e*.*'], whitelist: ['**'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+        });
 
-          expect(
-            anonymize({
-              foo: {
-                bar: {
-                  baz: { bax: [2, 3, { bax: 4, key1: '5' }] },
-                  key1: 'foobar',
-                  key2: 'foobiz'
-                }
-              }
-            })
-          ).toEqual({
-            foo: {
-              bar: {
-                baz: { bax: ['--REDACTED--', '--REDACTED--', { bax: '--REDACTED--', key1: '--REDACTED--' }] },
-                key1: '--REDACTED--',
-                key2: '--REDACTED--'
-              }
-            }
-          });
+        expect(anonymizer({ blacklist: ['parent1.*.foo'], whitelist: ['**'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: 'biz', foo: '--REDACTED--' },
+            foo: 'bar'
+          },
+          parent2: { bar: 'biz', foo: 'bar' }
+        });
+
+        expect(anonymizer({ blacklist: ['*.foo'], whitelist: ['**'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: 'biz', foo: '--REDACTED--' }
+        });
+
+        expect(anonymizer({ blacklist: ['*t1.foo'], whitelist: ['**'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: 'biz', foo: 'bar' }
+        });
+      });
+
+      it('should support double wildcard matching', () => {
+        const data = {
+          foo: 'bar',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: 'bar'
+          },
+          parent2: { bar: 'biz', foo: 'bar' }
+        };
+
+        expect(anonymizer({ blacklist: ['parent1.**'], whitelist: ['**'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: '--REDACTED--' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: 'biz', foo: 'bar' }
+        });
+
+        expect(anonymizer({ blacklist: ['parent**'], whitelist: ['**'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: '--REDACTED--' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+        });
+
+        expect(anonymizer({ blacklist: ['parent1.c**'], whitelist: ['**'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: '--REDACTED--' },
+            foo: 'bar'
+          },
+          parent2: { bar: 'biz', foo: 'bar' }
+        });
+
+        expect(anonymizer({ blacklist: ['parent1.**.foo'], whitelist: ['**'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: 'biz', foo: '--REDACTED--' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: 'biz', foo: 'bar' }
+        });
+
+        expect(anonymizer({ blacklist: ['**.foo'], whitelist: ['**'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: 'biz', foo: '--REDACTED--' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: 'biz', foo: '--REDACTED--' }
+        });
+
+        expect(anonymizer({ blacklist: ['**oo'], whitelist: ['**'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: 'biz', foo: '--REDACTED--' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: 'biz', foo: '--REDACTED--' }
+        });
+
+        expect(anonymizer({ blacklist: ['**.oo'], whitelist: ['**'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: 'bar'
+          },
+          parent2: { bar: 'biz', foo: 'bar' }
+        });
+
+        expect(anonymizer({ blacklist: ['**.fo'], whitelist: ['**'] })(data)).toEqual({
+          foo: 'bar',
+          parent1: {
+            child: { bar: 'biz', foo: 'bar' },
+            foo: 'bar'
+          },
+          parent2: { bar: 'biz', foo: 'bar' }
         });
       });
     });
@@ -259,7 +497,7 @@ describe('Anonymizer', () => {
     describe('serializers', () => {
       it('should throw an error when serializer is not a function', () => {
         const serializers = [{ path: 'foo', serializer: 123 }];
-        const whitelist = ['*'];
+        const whitelist = ['**'];
 
         try {
           anonymizer({ whitelist }, { serializers });
@@ -275,7 +513,7 @@ describe('Anonymizer', () => {
         const foobar = jest.fn(() => 'bii');
         const foobiz = jest.fn(() => 'bzz');
         const foobzz = jest.fn(() => ({ bar: 'biz' }));
-        const whitelist = ['*'];
+        const whitelist = ['**'];
         const serializers = [
           { path: 'bar', serializer: foobiz },
           { path: 'foo', serializer: foobar },
@@ -297,7 +535,7 @@ describe('Anonymizer', () => {
         const foobar = jest.fn(() => 'bii');
         const foobiz = jest.fn(() => 'bzz');
         const fooerror = jest.fn(serializeError);
-        const whitelist = ['*'];
+        const whitelist = ['**'];
         const serializers = [
           { path: 'bar.foo', serializer: foobiz },
           { path: 'bar.error', serializer: fooerror },
@@ -330,7 +568,7 @@ describe('Anonymizer', () => {
 
           return 'biz';
         });
-        const whitelist = ['*'];
+        const whitelist = ['**'];
         const serializers = [
           { path: 'foo', serializer: foobar },
           { path: 'foz', serializer: fozbar }
@@ -426,7 +664,7 @@ describe('Anonymizer', () => {
           return serialized;
         });
         const serializers = [{ path: 'error', serializer }];
-        const whitelist = ['*'];
+        const whitelist = ['**'];
         const anonymize = anonymizer({ whitelist }, { serializers });
 
         const result = anonymize({ error });
@@ -460,7 +698,7 @@ describe('Anonymizer', () => {
           return serialized;
         });
         const serializers = [{ path: 'error', serializer }];
-        const whitelist = ['*'];
+        const whitelist = ['**'];
         const anonymize = anonymizer({ whitelist }, { serializers });
 
         const result = anonymize({ error });
@@ -485,7 +723,7 @@ describe('Anonymizer', () => {
           { path: 'foo', serializer },
           { path: 'foz', serializer }
         ];
-        const whitelist = ['*'];
+        const whitelist = ['**'];
         const anonymize = anonymizer({ whitelist }, { serializers });
 
         const result = anonymize(data);
@@ -506,7 +744,7 @@ describe('Anonymizer', () => {
             { path: 'err', serializer },
             { path: 'error', serializer }
           ];
-          const whitelist = ['*'];
+          const whitelist = ['**'];
           const anonymize = anonymizer({ whitelist }, { serializers });
 
           const result = anonymize({

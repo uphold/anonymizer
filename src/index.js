@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-const { cloneDeep, cloneDeepWith, get, set } = require('lodash');
+const { cloneDeep, cloneDeepWith, escapeRegExp, get, set } = require('lodash');
 const { serializeError } = require('serialize-error');
 const stringify = require('json-stringify-safe');
 const traverse = require('traverse');
@@ -121,7 +121,18 @@ const createPathTester = patterns => {
   const wildcardPatterns = patterns.filter(pattern => pattern.includes('*')).map(pattern => pattern.toLowerCase());
 
   const regularPatternsSet = new Set(regularPatterns);
-  const wildcardRegExp = new RegExp(`^(${wildcardPatterns.join('|').replace(/\./g, '\\.').replace(/\*/g, '.*')})$`);
+  const wildcardRegExp = new RegExp(
+    `^(${wildcardPatterns.map(pattern =>
+      // Escape regex special characters.
+      escapeRegExp(pattern)
+        // Handle `**` feature.
+        .replaceAll('\\.\\*\\*\\.', '\\..*')
+        .replaceAll('\\*\\*\\.', '(.*\\.)?')
+        .replaceAll('\\*\\*', '.*')
+        // Handle `*` feature.
+        .replaceAll('\\*', '[^\\.]*')
+    )})$`
+  );
 
   return path => {
     const lowercasedPath = path.toLowerCase();
