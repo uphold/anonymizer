@@ -4,12 +4,8 @@
  * Module dependencies.
  */
 
-const {
-  anonymizer,
-  defaultSerializers: { datadogSerializer }
-} = require('src');
+const { anonymizer, serializers: builtinSerializers } = require('src');
 const { generateObjectSample, generateObjectSamplePaths } = require('./benchmark/samples');
-const { serializeError } = require('serialize-error');
 
 /**
  * Test `Anonymizer`.
@@ -534,7 +530,7 @@ describe('Anonymizer', () => {
         const error = new Error('foobar');
         const foobar = jest.fn(() => 'bii');
         const foobiz = jest.fn(() => 'bzz');
-        const fooerror = jest.fn(serializeError);
+        const fooerror = jest.fn(builtinSerializers.error);
         const whitelist = ['**'];
         const serializers = [
           { path: 'bar.foo', serializer: foobiz },
@@ -594,7 +590,7 @@ describe('Anonymizer', () => {
         }
 
         const error = new ValidationError('foobar');
-        const serializer = jest.fn(datadogSerializer);
+        const serializer = jest.fn(builtinSerializers.datadogError);
         const serializers = [{ path: 'error', serializer }];
         const whitelist = ['error.foo', 'error.kind', 'error.message', 'error.name', 'error.stack'];
         const anonymize = anonymizer({ whitelist }, { serializers });
@@ -629,7 +625,7 @@ describe('Anonymizer', () => {
         }
 
         const error = new ErrorTwo('foobar');
-        const serializer = jest.fn(datadogSerializer);
+        const serializer = jest.fn(builtinSerializers.datadogError);
         const serializers = [{ path: 'error', serializer }];
         const whitelist = ['error.foo', 'error.kind', 'error.message', 'error.name', 'error.stack'];
         const anonymize = anonymizer({ whitelist }, { serializers });
@@ -657,7 +653,7 @@ describe('Anonymizer', () => {
 
         const error = new ValidationError('foobar');
         const serializer = jest.fn(value => {
-          const serialized = datadogSerializer(value);
+          const serialized = builtinSerializers.datadogError(value);
 
           value.foo.for = 'bar';
 
@@ -691,7 +687,7 @@ describe('Anonymizer', () => {
 
         const error = new ValidationError('foobar');
         const serializer = jest.fn(value => {
-          const serialized = datadogSerializer(value);
+          const serialized = builtinSerializers.datadogError(value);
 
           value.foo.for.bar.foo = 'bar';
 
@@ -735,10 +731,10 @@ describe('Anonymizer', () => {
         expect(serializer).toHaveBeenCalledTimes(2);
       });
 
-      describe('defaultSerializers', () => {
-        it('should serialize errors when `serializeError()` is applied', () => {
+      describe('built-in', () => {
+        it('should serialize errors when `builtinSerializers.error()` is applied', () => {
           const error = new Error('foobar');
-          const serializer = jest.fn(serializeError);
+          const serializer = jest.fn(builtinSerializers.error);
           const serializers = [
             { path: 'e', serializer },
             { path: 'err', serializer },
@@ -775,9 +771,9 @@ describe('Anonymizer', () => {
           expect(result.foo).toEqual('bar');
         });
 
-        it('should serialize errors when `datadogSerializer()` is applied', () => {
+        it('should serialize errors when `builtinSerializers.datadogError()` is applied', () => {
           const error = new Error('foobar');
-          const serializer = jest.fn(datadogSerializer);
+          const serializer = jest.fn(builtinSerializers.datadogError);
           const serializers = [
             { path: 'err', serializer },
             { path: 'error', serializer }
@@ -881,7 +877,7 @@ describe('Anonymizer', () => {
       it('should run a sample with `32768` properties in less than `150` ms', () => {
         const depth = 10;
         const data = generateObjectSample({ depth });
-        const anonymize = anonymizer({ blacklist: ['*'] });
+        const anonymize = anonymizer({});
         const startTime = process.hrtime();
 
         anonymize(data);
@@ -897,7 +893,7 @@ describe('Anonymizer', () => {
         const data = generateObjectSample({ depth });
         const serializer = jest.fn(() => 'bii');
         const serializers = generateObjectSamplePaths({ depth }).map(path => ({ path, serializer }));
-        const anonymize = anonymizer({ blacklist: ['*'] }, { serializers });
+        const anonymize = anonymizer({}, { serializers });
         const startTime = process.hrtime();
 
         anonymize(data);
@@ -909,12 +905,12 @@ describe('Anonymizer', () => {
         expect(serializer).toHaveBeenCalledTimes(32768);
       });
 
-      it('should call `serializeError` in all `32768` properties in less than `175` ms', () => {
+      it('should call `builtinSerializers.error` in all `32768` properties in less than `175` ms', () => {
         const depth = 10;
         const data = generateObjectSample({ depth, leafValue: () => new Error('foobar') });
-        const serializer = jest.fn(serializeError);
+        const serializer = jest.fn(builtinSerializers.error);
         const serializers = generateObjectSamplePaths({ depth }).map(path => ({ path, serializer }));
-        const anonymize = anonymizer({ blacklist: ['*'] }, { serializers });
+        const anonymize = anonymizer({}, { serializers });
         const startTime = process.hrtime();
 
         anonymize(data);

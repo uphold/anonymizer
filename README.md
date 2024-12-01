@@ -298,7 +298,7 @@ Built-in serializer functions you may use in the `serializers` option.
 
 Serializes an `Error` object.
 
-#### datadogSerializer
+#### datadogError
 
 Serializes an `Error` object for the purpose of sending it to Datadog, adding a `kind` property based on the error class name.
 
