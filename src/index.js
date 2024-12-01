@@ -5,7 +5,7 @@
  */
 
 const { cloneDeep, cloneDeepWith, escapeRegExp, get, set } = require('lodash');
-const { serializeError } = require('serialize-error');
+const { serializeError: errorSerializer } = require('serialize-error');
 const stringify = require('json-stringify-safe');
 const traverse = require('traverse');
 
@@ -215,7 +215,7 @@ module.exports.anonymizer = (
  * Default serializer for Datadog.
  */
 
-function datadogSerializer(error) {
+function datadogErrorSerializer(error) {
   return {
     ...error,
     kind: error.name || 'Error'
@@ -223,10 +223,10 @@ function datadogSerializer(error) {
 }
 
 /**
- * Module exports `defaultSerializers`.
+ * Module exports `serializers`.
  */
 
-module.exports.defaultSerializers = {
-  datadogSerializer,
-  error: serializeError
+module.exports.serializers = {
+  datadogError: datadogErrorSerializer,
+  error: errorSerializer
 };
