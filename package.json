@@ -1,7 +1,7 @@
 {
   "name": "@uphold/anonymizer",
   "version": "5.1.0",
-  "description": "Object redaction with whitelist as main feature.",
+  "description": "Object redaction library that supports whitelisting, blacklisting, and wildcard matching",
   "homepage": "https://github.com/uphold/anonymizer#readme",
   "bugs": {
     "url": "https://github.com/uphold/anonymizer/issues"

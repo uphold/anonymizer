@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-const { cloneDeep, cloneDeepWith, get, set } = require('lodash');
+const { cloneDeep, cloneDeepWith, escapeRegExp, get, set } = require('lodash');
 const { serializeError } = require('serialize-error');
 const stringify = require('json-stringify-safe');
 const traverse = require('traverse');
@@ -74,8 +74,8 @@ function validateSerializers(serializers) {
  * During `parseAndSerialize` execution, we perform additional copies to avoid having a serializer updating the
  * original object by reference. These copies are only done in the values passed to serializers to avoid two full
  * copies of the original values. For this, we used `cloneDeepWith` with a custom clone only for errors. When an
- * error is found, we compute a list with all properties (properties from the class itself and from extended cla-
- * sses). Then we use these properties to get the original values and copying them into a new object.
+ * error is found, we compute a list with all properties (properties from the class itself and from extended classes).
+ * Then we use these properties to get the original values and copying them into a new object.
  */
 
 function parseAndSerialize(values, serializers) {
@@ -107,6 +107,25 @@ function parseAndSerialize(values, serializers) {
 }
 
 /**
+ * Parses patterns into a single RegExp.
+ */
+
+function parsePatternsIntoRegExp(patterns) {
+  const patternRegExps = patterns.map(pattern =>
+    // Escape regex special characters.
+    escapeRegExp(pattern)
+      // Handle `**` feature.
+      .replaceAll('\\.\\*\\*\\.', '\\..*')
+      .replaceAll('\\*\\*\\.', '(.*\\.)?')
+      .replaceAll('\\*\\*', '.*')
+      // Handle `*` feature.
+      .replaceAll('\\*', '[^\\.]*')
+  );
+
+  return new RegExp(`^(${patternRegExps.join('|')})$`, 'i');
+}
+
+/**
  * Module exports `anonymizer` function.
  */
 
@@ -114,10 +133,8 @@ module.exports.anonymizer = (
   { blacklist = [], whitelist = [] } = {},
   { replacement = () => DEFAULT_REPLACEMENT, serializers = [], trim = false } = {}
 ) => {
-  const whitelistTerms = whitelist.join('|');
-  const whitelistPaths = new RegExp(`^(${whitelistTerms.replace(/\./g, '\\.').replace(/\*/g, '.*')})$`, 'i');
-  const blacklistTerms = blacklist.join('|');
-  const blacklistPaths = new RegExp(`^(${blacklistTerms.replace(/\./g, '\\.').replace(/\*/g, '.*')})$`, 'i');
+  const whitelistRegExp = parsePatternsIntoRegExp(whitelist);
+  const blacklistRegExp = parsePatternsIntoRegExp(blacklist);
 
   validateSerializers(serializers);
 
@@ -145,13 +162,13 @@ module.exports.anonymizer = (
         return;
       }
 
-      if (isBuffer && !blacklistPaths.test(path) && whitelistPaths.test(path)) {
+      if (isBuffer && !blacklistRegExp.test(path) && whitelistRegExp.test(path)) {
         return this.update(Buffer.from(this.node), true);
       }
 
-      const replacedValue = replacement(this.key, this.node, this.path);
+      if (blacklistRegExp.test(path) || !whitelistRegExp.test(path)) {
+        const replacedValue = replacement(this.key, this.node, this.path);
 
-      if (blacklistPaths.test(path) || !whitelistPaths.test(path)) {
         if (trim && replacedValue === DEFAULT_REPLACEMENT) {
           const path = this.path.map(value => (isNaN(value) ? value : '[]'));
 
