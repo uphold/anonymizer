@@ -148,15 +148,20 @@ module.exports.anonymizer = (
 
     traverse(obj).forEach(function () {
       const path = this.path.join('.');
-      const isBuffer = Buffer.isBuffer(get(values, path));
+
+      if (this.isRoot) {
+        return;
+      }
 
       if (trim) {
         this.after(function (node) {
           if (!this.isLeaf && Object.values(node).every(value => value === undefined)) {
-            return this.isRoot ? this.update(undefined, true) : this.delete();
+            return this.delete();
           }
         });
       }
+
+      const isBuffer = Buffer.isBuffer(get(values, path));
 
       if (!isBuffer && !this.isLeaf) {
         return;
@@ -170,11 +175,11 @@ module.exports.anonymizer = (
         const replacedValue = replacement(this.key, this.node, this.path);
 
         if (trim && replacedValue === DEFAULT_REPLACEMENT) {
-          const path = this.path.map(value => (isNaN(value) ? value : '[]'));
+          const path = this.path.map(value => (isNaN(value) ? value : '[]')).join('.');
 
-          blacklistedKeys.add(path.join('.'));
+          blacklistedKeys.add(path);
 
-          return this.isRoot ? this.update(undefined, true) : this.delete();
+          return this.delete();
         }
 
         this.update(replacedValue);

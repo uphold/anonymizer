@@ -841,6 +841,12 @@ describe('Anonymizer', () => {
         });
       });
 
+      it('should not add `__redacted__` when anonymizing an empty object', () => {
+        const anonymize = anonymizer({}, { trim: true });
+
+        expect(anonymize({})).toEqual({});
+      });
+
       it('should not trim obfuscated values that have different obfuscation techniques', () => {
         const replacement = (key, value) => {
           if (key === 'biz') {
