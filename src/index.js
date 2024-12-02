@@ -74,8 +74,8 @@ function validateSerializers(serializers) {
  * During `parseAndSerialize` execution, we perform additional copies to avoid having a serializer updating the
  * original object by reference. These copies are only done in the values passed to serializers to avoid two full
  * copies of the original values. For this, we used `cloneDeepWith` with a custom clone only for errors. When an
- * error is found, we compute a list with all properties (properties from the class itself and from extended cla-
- * sses). Then we use these properties to get the original values and copying them into a new object.
+ * error is found, we compute a list with all properties (properties from the class itself and from extended classes).
+ * Then we use these properties to get the original values and copying them into a new object.
  */
 
 function parseAndSerialize(values, serializers) {
@@ -107,6 +107,30 @@ function parseAndSerialize(values, serializers) {
 }
 
 /**
+ * Creates a path tester function used to check if a path matches a list of patterns.
+ *
+ * This function was built with optimization in mind.
+ * It separates the patterns into two lists, regular patterns and wildcard pattern, and applies the following strategy:
+ *
+ * 1. It tries to find an exact match in the regular patterns first, which is faster.
+ * 2. If no match is found, it uses a regular expression to test the wildcard patterns.
+ */
+
+const createPathTester = patterns => {
+  const regularPatterns = patterns.filter(pattern => !pattern.includes('*')).map(pattern => pattern.toLowerCase());
+  const wildcardPatterns = patterns.filter(pattern => pattern.includes('*')).map(pattern => pattern.toLowerCase());
+
+  const regularPatternsSet = new Set(regularPatterns);
+  const wildcardRegExp = new RegExp(`^(${wildcardPatterns.join('|').replace(/\./g, '\\.').replace(/\*/g, '.*')})$`);
+
+  return path => {
+    const lowercasedPath = path.toLowerCase();
+
+    return regularPatternsSet.has(lowercasedPath) || wildcardRegExp.test(lowercasedPath);
+  };
+};
+
+/**
  * Module exports `anonymizer` function.
  */
 
@@ -114,12 +138,10 @@ module.exports.anonymizer = (
   { blacklist = [], whitelist = [] } = {},
   { replacement = () => DEFAULT_REPLACEMENT, serializers = [], trim = false } = {}
 ) => {
-  const whitelistTerms = whitelist.join('|');
-  const whitelistPaths = new RegExp(`^(${whitelistTerms.replace(/\./g, '\\.').replace(/\*/g, '.*')})$`, 'i');
-  const blacklistTerms = blacklist.join('|');
-  const blacklistPaths = new RegExp(`^(${blacklistTerms.replace(/\./g, '\\.').replace(/\*/g, '.*')})$`, 'i');
-
   validateSerializers(serializers);
+
+  const isWhitelisted = createPathTester(whitelist);
+  const isBlacklisted = createPathTester(blacklist);
 
   return values => {
     if (!(values instanceof Object)) {
@@ -130,37 +152,42 @@ module.exports.anonymizer = (
     const obj = parseAndSerialize(values, serializers);
 
     traverse(obj).forEach(function () {
-      const path = this.path.join('.');
-      const isBuffer = Buffer.isBuffer(get(values, path));
+      if (this.isRoot) {
+        return;
+      }
 
       if (trim) {
         this.after(function (node) {
           if (!this.isLeaf && Object.values(node).every(value => value === undefined)) {
-            return this.isRoot ? this.update(undefined, true) : this.delete();
+            return this.delete();
           }
         });
       }
+
+      const isBuffer = this.node?.type === 'Buffer' && Array.isArray(this.node.data);
 
       if (!isBuffer && !this.isLeaf) {
         return;
       }
 
-      if (isBuffer && !blacklistPaths.test(path) && whitelistPaths.test(path)) {
-        return this.update(Buffer.from(this.node), true);
-      }
+      const path = this.path.join('.');
+      const whitelisted = isWhitelisted(path);
+      const blacklisted = isBlacklisted(path);
 
-      const replacedValue = replacement(this.key, this.node, this.path);
+      if (blacklisted || !whitelisted) {
+        const replacedValue = replacement(this.key, this.node, this.path);
 
-      if (blacklistPaths.test(path) || !whitelistPaths.test(path)) {
         if (trim && replacedValue === DEFAULT_REPLACEMENT) {
           const path = this.path.map(value => (isNaN(value) ? value : '[]'));
 
           blacklistedKeys.add(path.join('.'));
 
-          return this.isRoot ? this.update(undefined, true) : this.delete();
+          return this.delete();
         }
 
         this.update(replacedValue);
+      } else if (isBuffer) {
+        return this.update(Buffer.from(this.node), true);
       }
     });
 
