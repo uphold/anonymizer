@@ -1,5 +1,9 @@
 # Changelog
 
+## [v6.0.0](https://github.com/uphold/anonymizer/releases/tag/v6.0.0) (2024-12-04)
+- Standardize serializer exports [\#84](https://github.com/uphold/anonymizer/pull/84) ([satazor](https://github.com/satazor))
+- Add support for glob alike pattern matching [\#83](https://github.com/uphold/anonymizer/pull/83) ([satazor](https://github.com/satazor))
+
 ## [v5.2.0](https://github.com/uphold/anonymizer/releases/tag/v5.2.0) (2024-12-04)
 - Improve performance [\#86](https://github.com/uphold/anonymizer/pull/86) ([satazor](https://github.com/satazor))
 
