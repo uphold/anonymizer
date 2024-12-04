@@ -1,5 +1,8 @@
 # Changelog
 
+## [v5.2.0](https://github.com/uphold/anonymizer/releases/tag/v5.2.0) (2024-12-04)
+- Improve performance [\#86](https://github.com/uphold/anonymizer/pull/86) ([satazor](https://github.com/satazor))
+
 ## [v5.1.0](https://github.com/uphold/anonymizer/releases/tag/v5.1.0) (2024-11-08)
 - Fix release git config [\#82](https://github.com/uphold/anonymizer/pull/82) ([Americas](https://github.com/Americas))
 - Fix yarn install on release script [\#81](https://github.com/uphold/anonymizer/pull/81) ([Americas](https://github.com/Americas))
