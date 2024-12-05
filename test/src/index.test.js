@@ -97,16 +97,18 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: 'bar' },
             foo: 'bar'
           },
-          parent2: { bar: 'biz', foo: 'bar' }
+          parent2: { bar: 'biz', foo: 'bar' },
+          parent3: ['foo', { foo: 'bar' }]
         };
 
-        expect(anonymizer({ whitelist: ['parent1.*'] })(data)).toEqual({
+        expect(anonymizer({ whitelist: ['parent1.*', 'parent3.*'] })(data)).toEqual({
           foo: '--REDACTED--',
           parent1: {
             child: { bar: '--REDACTED--', foo: '--REDACTED--' },
             foo: 'bar'
           },
-          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' },
+          parent3: ['foo', { foo: '--REDACTED--' }]
         });
 
         expect(anonymizer({ whitelist: ['parent2.f*'] })(data)).toEqual({
@@ -115,7 +117,8 @@ describe('Anonymizer', () => {
             child: { bar: '--REDACTED--', foo: '--REDACTED--' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: '--REDACTED--', foo: 'bar' }
+          parent2: { bar: '--REDACTED--', foo: 'bar' },
+          parent3: ['--REDACTED--', { foo: '--REDACTED--' }]
         });
 
         expect(anonymizer({ whitelist: ['parent2.*o'] })(data)).toEqual({
@@ -124,7 +127,8 @@ describe('Anonymizer', () => {
             child: { bar: '--REDACTED--', foo: '--REDACTED--' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: '--REDACTED--', foo: 'bar' }
+          parent2: { bar: '--REDACTED--', foo: 'bar' },
+          parent3: ['--REDACTED--', { foo: '--REDACTED--' }]
         });
 
         expect(anonymizer({ whitelist: ['parent2.*o*'] })(data)).toEqual({
@@ -133,7 +137,8 @@ describe('Anonymizer', () => {
             child: { bar: '--REDACTED--', foo: '--REDACTED--' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: '--REDACTED--', foo: 'bar' }
+          parent2: { bar: '--REDACTED--', foo: 'bar' },
+          parent3: ['--REDACTED--', { foo: '--REDACTED--' }]
         });
 
         expect(anonymizer({ whitelist: ['*e*.*'] })(data)).toEqual({
@@ -142,7 +147,8 @@ describe('Anonymizer', () => {
             child: { bar: '--REDACTED--', foo: '--REDACTED--' },
             foo: 'bar'
           },
-          parent2: { bar: 'biz', foo: 'bar' }
+          parent2: { bar: 'biz', foo: 'bar' },
+          parent3: ['foo', { foo: '--REDACTED--' }]
         });
 
         expect(anonymizer({ whitelist: ['parent1.*.foo'] })(data)).toEqual({
@@ -151,7 +157,8 @@ describe('Anonymizer', () => {
             child: { bar: '--REDACTED--', foo: 'bar' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' },
+          parent3: ['--REDACTED--', { foo: '--REDACTED--' }]
         });
 
         expect(anonymizer({ whitelist: ['*.foo'] })(data)).toEqual({
@@ -160,7 +167,8 @@ describe('Anonymizer', () => {
             child: { bar: '--REDACTED--', foo: '--REDACTED--' },
             foo: 'bar'
           },
-          parent2: { bar: '--REDACTED--', foo: 'bar' }
+          parent2: { bar: '--REDACTED--', foo: 'bar' },
+          parent3: ['--REDACTED--', { foo: '--REDACTED--' }]
         });
 
         expect(anonymizer({ whitelist: ['*t1.foo'] })(data)).toEqual({
@@ -169,7 +177,8 @@ describe('Anonymizer', () => {
             child: { bar: '--REDACTED--', foo: '--REDACTED--' },
             foo: 'bar'
           },
-          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' },
+          parent3: ['--REDACTED--', { foo: '--REDACTED--' }]
         });
       });
 
@@ -180,16 +189,18 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: 'bar' },
             foo: 'bar'
           },
-          parent2: { bar: 'biz', foo: 'bar' }
+          parent2: { bar: 'biz', foo: 'bar' },
+          parent3: ['foo', { foo: 'bar' }]
         };
 
-        expect(anonymizer({ whitelist: ['parent1.**'] })(data)).toEqual({
+        expect(anonymizer({ whitelist: ['parent1.**', 'parent3.**'] })(data)).toEqual({
           foo: '--REDACTED--',
           parent1: {
             child: { bar: 'biz', foo: 'bar' },
             foo: 'bar'
           },
-          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' },
+          parent3: ['foo', { foo: 'bar' }]
         });
 
         expect(anonymizer({ whitelist: ['parent**'] })(data)).toEqual({
@@ -198,7 +209,8 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: 'bar' },
             foo: 'bar'
           },
-          parent2: { bar: 'biz', foo: 'bar' }
+          parent2: { bar: 'biz', foo: 'bar' },
+          parent3: ['foo', { foo: 'bar' }]
         });
 
         expect(anonymizer({ whitelist: ['parent1.c**'] })(data)).toEqual({
@@ -207,7 +219,8 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: 'bar' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' },
+          parent3: ['--REDACTED--', { foo: '--REDACTED--' }]
         });
 
         expect(anonymizer({ whitelist: ['parent1.**.foo'] })(data)).toEqual({
@@ -216,7 +229,8 @@ describe('Anonymizer', () => {
             child: { bar: '--REDACTED--', foo: 'bar' },
             foo: 'bar'
           },
-          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' },
+          parent3: ['--REDACTED--', { foo: '--REDACTED--' }]
         });
 
         expect(anonymizer({ whitelist: ['**.foo'] })(data)).toEqual({
@@ -225,7 +239,8 @@ describe('Anonymizer', () => {
             child: { bar: '--REDACTED--', foo: 'bar' },
             foo: 'bar'
           },
-          parent2: { bar: '--REDACTED--', foo: 'bar' }
+          parent2: { bar: '--REDACTED--', foo: 'bar' },
+          parent3: ['--REDACTED--', { foo: 'bar' }]
         });
 
         expect(anonymizer({ whitelist: ['**oo'] })(data)).toEqual({
@@ -234,7 +249,8 @@ describe('Anonymizer', () => {
             child: { bar: '--REDACTED--', foo: 'bar' },
             foo: 'bar'
           },
-          parent2: { bar: '--REDACTED--', foo: 'bar' }
+          parent2: { bar: '--REDACTED--', foo: 'bar' },
+          parent3: ['--REDACTED--', { foo: 'bar' }]
         });
 
         expect(anonymizer({ whitelist: ['**.oo'] })(data)).toEqual({
@@ -243,7 +259,8 @@ describe('Anonymizer', () => {
             child: { bar: '--REDACTED--', foo: '--REDACTED--' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' },
+          parent3: ['--REDACTED--', { foo: '--REDACTED--' }]
         });
 
         expect(anonymizer({ whitelist: ['**.fo'] })(data)).toEqual({
@@ -252,7 +269,18 @@ describe('Anonymizer', () => {
             child: { bar: '--REDACTED--', foo: '--REDACTED--' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' },
+          parent3: ['--REDACTED--', { foo: '--REDACTED--' }]
+        });
+
+        expect(anonymizer({ whitelist: ['parent3.**'] })(data)).toEqual({
+          foo: '--REDACTED--',
+          parent1: {
+            child: { bar: '--REDACTED--', foo: '--REDACTED--' },
+            foo: '--REDACTED--'
+          },
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' },
+          parent3: ['foo', { foo: 'bar' }]
         });
       });
     });
@@ -305,16 +333,18 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: 'bar' },
             foo: 'bar'
           },
-          parent2: { bar: 'biz', foo: 'bar' }
+          parent2: { bar: 'biz', foo: 'bar' },
+          parent3: ['foo', { foo: 'bar' }]
         };
 
-        expect(anonymizer({ blacklist: ['parent1.*'], whitelist: ['**'] })(data)).toEqual({
+        expect(anonymizer({ blacklist: ['parent1.*', 'parent3.*'], whitelist: ['**'] })(data)).toEqual({
           foo: 'bar',
           parent1: {
             child: { bar: 'biz', foo: 'bar' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: 'biz', foo: 'bar' }
+          parent2: { bar: 'biz', foo: 'bar' },
+          parent3: ['--REDACTED--', { foo: 'bar' }]
         });
 
         expect(anonymizer({ blacklist: ['parent2.f*'], whitelist: ['**'] })(data)).toEqual({
@@ -323,7 +353,8 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: 'bar' },
             foo: 'bar'
           },
-          parent2: { bar: 'biz', foo: '--REDACTED--' }
+          parent2: { bar: 'biz', foo: '--REDACTED--' },
+          parent3: ['foo', { foo: 'bar' }]
         });
 
         expect(anonymizer({ blacklist: ['parent2.*o'], whitelist: ['**'] })(data)).toEqual({
@@ -332,7 +363,8 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: 'bar' },
             foo: 'bar'
           },
-          parent2: { bar: 'biz', foo: '--REDACTED--' }
+          parent2: { bar: 'biz', foo: '--REDACTED--' },
+          parent3: ['foo', { foo: 'bar' }]
         });
 
         expect(anonymizer({ blacklist: ['parent2.*o*'], whitelist: ['**'] })(data)).toEqual({
@@ -341,7 +373,8 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: 'bar' },
             foo: 'bar'
           },
-          parent2: { bar: 'biz', foo: '--REDACTED--' }
+          parent2: { bar: 'biz', foo: '--REDACTED--' },
+          parent3: ['foo', { foo: 'bar' }]
         });
 
         expect(anonymizer({ blacklist: ['*e*.*'], whitelist: ['**'] })(data)).toEqual({
@@ -350,7 +383,8 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: 'bar' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' },
+          parent3: ['--REDACTED--', { foo: 'bar' }]
         });
 
         expect(anonymizer({ blacklist: ['parent1.*.foo'], whitelist: ['**'] })(data)).toEqual({
@@ -359,7 +393,8 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: '--REDACTED--' },
             foo: 'bar'
           },
-          parent2: { bar: 'biz', foo: 'bar' }
+          parent2: { bar: 'biz', foo: 'bar' },
+          parent3: ['foo', { foo: 'bar' }]
         });
 
         expect(anonymizer({ blacklist: ['*.foo'], whitelist: ['**'] })(data)).toEqual({
@@ -368,7 +403,8 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: 'bar' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: 'biz', foo: '--REDACTED--' }
+          parent2: { bar: 'biz', foo: '--REDACTED--' },
+          parent3: ['foo', { foo: 'bar' }]
         });
 
         expect(anonymizer({ blacklist: ['*t1.foo'], whitelist: ['**'] })(data)).toEqual({
@@ -377,7 +413,8 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: 'bar' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: 'biz', foo: 'bar' }
+          parent2: { bar: 'biz', foo: 'bar' },
+          parent3: ['foo', { foo: 'bar' }]
         });
       });
 
@@ -388,16 +425,18 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: 'bar' },
             foo: 'bar'
           },
-          parent2: { bar: 'biz', foo: 'bar' }
+          parent2: { bar: 'biz', foo: 'bar' },
+          parent3: ['foo', { foo: 'bar' }]
         };
 
-        expect(anonymizer({ blacklist: ['parent1.**'], whitelist: ['**'] })(data)).toEqual({
+        expect(anonymizer({ blacklist: ['parent1.**', 'parent3.**'], whitelist: ['**'] })(data)).toEqual({
           foo: 'bar',
           parent1: {
             child: { bar: '--REDACTED--', foo: '--REDACTED--' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: 'biz', foo: 'bar' }
+          parent2: { bar: 'biz', foo: 'bar' },
+          parent3: ['--REDACTED--', { foo: '--REDACTED--' }]
         });
 
         expect(anonymizer({ blacklist: ['parent**'], whitelist: ['**'] })(data)).toEqual({
@@ -406,7 +445,8 @@ describe('Anonymizer', () => {
             child: { bar: '--REDACTED--', foo: '--REDACTED--' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' }
+          parent2: { bar: '--REDACTED--', foo: '--REDACTED--' },
+          parent3: ['--REDACTED--', { foo: '--REDACTED--' }]
         });
 
         expect(anonymizer({ blacklist: ['parent1.c**'], whitelist: ['**'] })(data)).toEqual({
@@ -415,7 +455,8 @@ describe('Anonymizer', () => {
             child: { bar: '--REDACTED--', foo: '--REDACTED--' },
             foo: 'bar'
           },
-          parent2: { bar: 'biz', foo: 'bar' }
+          parent2: { bar: 'biz', foo: 'bar' },
+          parent3: ['foo', { foo: 'bar' }]
         });
 
         expect(anonymizer({ blacklist: ['parent1.**.foo'], whitelist: ['**'] })(data)).toEqual({
@@ -424,7 +465,8 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: '--REDACTED--' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: 'biz', foo: 'bar' }
+          parent2: { bar: 'biz', foo: 'bar' },
+          parent3: ['foo', { foo: 'bar' }]
         });
 
         expect(anonymizer({ blacklist: ['**.foo'], whitelist: ['**'] })(data)).toEqual({
@@ -433,7 +475,8 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: '--REDACTED--' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: 'biz', foo: '--REDACTED--' }
+          parent2: { bar: 'biz', foo: '--REDACTED--' },
+          parent3: ['foo', { foo: '--REDACTED--' }]
         });
 
         expect(anonymizer({ blacklist: ['**oo'], whitelist: ['**'] })(data)).toEqual({
@@ -442,7 +485,8 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: '--REDACTED--' },
             foo: '--REDACTED--'
           },
-          parent2: { bar: 'biz', foo: '--REDACTED--' }
+          parent2: { bar: 'biz', foo: '--REDACTED--' },
+          parent3: ['foo', { foo: '--REDACTED--' }]
         });
 
         expect(anonymizer({ blacklist: ['**.oo'], whitelist: ['**'] })(data)).toEqual({
@@ -451,7 +495,8 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: 'bar' },
             foo: 'bar'
           },
-          parent2: { bar: 'biz', foo: 'bar' }
+          parent2: { bar: 'biz', foo: 'bar' },
+          parent3: ['foo', { foo: 'bar' }]
         });
 
         expect(anonymizer({ blacklist: ['**.fo'], whitelist: ['**'] })(data)).toEqual({
@@ -460,7 +505,8 @@ describe('Anonymizer', () => {
             child: { bar: 'biz', foo: 'bar' },
             foo: 'bar'
           },
-          parent2: { bar: 'biz', foo: 'bar' }
+          parent2: { bar: 'biz', foo: 'bar' },
+          parent3: ['foo', { foo: 'bar' }]
         });
       });
     });

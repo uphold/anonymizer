@@ -121,18 +121,17 @@ const createPathTester = patterns => {
   const wildcardPatterns = patterns.filter(pattern => pattern.includes('*')).map(pattern => pattern.toLowerCase());
 
   const regularPatternsSet = new Set(regularPatterns);
-  const wildcardRegExp = new RegExp(
-    `^(${wildcardPatterns.map(pattern =>
-      // Escape regex special characters.
-      escapeRegExp(pattern)
-        // Handle `**` feature.
-        .replaceAll('\\.\\*\\*\\.', '\\..*')
-        .replaceAll('\\*\\*\\.', '(.*\\.)?')
-        .replaceAll('\\*\\*', '.*')
-        // Handle `*` feature.
-        .replaceAll('\\*', '[^\\.]*')
-    )})$`
+  const wildcardRegExpParts = wildcardPatterns.map(pattern =>
+    // Escape regex special characters.
+    escapeRegExp(pattern)
+      // Handle `**` feature.
+      .replaceAll('\\.\\*\\*\\.', '\\..*')
+      .replaceAll('\\*\\*\\.', '(.*\\.)?')
+      .replaceAll('\\*\\*', '.*')
+      // Handle `*` feature.
+      .replaceAll('\\*', '[^\\.]*')
   );
+  const wildcardRegExp = new RegExp(`^(${wildcardRegExpParts.join('|')})$`);
 
   return path => {
     const lowercasedPath = path.toLowerCase();
