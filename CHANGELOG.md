@@ -1,5 +1,8 @@
 # Changelog
 
+## [v6.0.2](https://github.com/uphold/anonymizer/releases/tag/v6.0.2) (2025-04-15)
+- Fix redaction when double wildcards are used in certain conditions [\#88](https://github.com/uphold/anonymizer/pull/88) ([satazor](https://github.com/satazor))
+
 ## [v6.0.1](https://github.com/uphold/anonymizer/releases/tag/v6.0.1) (2024-12-05)
 - Fix behavior when multiple glob patterns are specified [\#87](https://github.com/uphold/anonymizer/pull/87) ([satazor](https://github.com/satazor))
 
