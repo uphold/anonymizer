@@ -125,7 +125,6 @@ const createPathTester = patterns => {
     // Escape regex special characters.
     escapeRegExp(pattern)
       // Handle `**` feature.
-      .replaceAll('\\.\\*\\*\\.', '\\..*')
       .replaceAll('\\*\\*\\.', '(.*\\.)?')
       .replaceAll('\\*\\*', '.*')
       // Handle `*` feature.
