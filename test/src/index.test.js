@@ -832,9 +832,21 @@ describe('Anonymizer', () => {
           const serializer = jest.fn(builtinSerializers.datadogError);
           const serializers = [
             { path: 'err', serializer },
+            { path: 'errArr', serializer },
+            { path: 'errStr', serializer },
             { path: 'error', serializer }
           ];
-          const whitelist = ['error.foo', 'error.kind', 'error.message', 'error.name', 'error.stack'];
+          const whitelist = [
+            'errArr.details.*',
+            'errArr.kind',
+            'errStr.details',
+            'errStr.kind',
+            'error.foo',
+            'error.kind',
+            'error.message',
+            'error.name',
+            'error.stack'
+          ];
           const anonymize = anonymizer({ whitelist }, { serializers });
 
           const result = anonymize({
@@ -842,15 +854,25 @@ describe('Anonymizer', () => {
             err: {
               statusCode: 400
             },
+            errArr: ['foo', 'bar'],
+            errStr: 'foobar',
             error,
             error2: error,
             foo: 'bar'
           });
 
-          expect(serializer).toHaveBeenCalledTimes(2);
+          expect(serializer).toHaveBeenCalledTimes(4);
           expect(result.err).toEqual({
             kind: '--REDACTED--',
             statusCode: '--REDACTED--'
+          });
+          expect(result.errArr).toEqual({
+            details: ['foo', 'bar'],
+            kind: 'Error'
+          });
+          expect(result.errStr).toEqual({
+            details: 'foobar',
+            kind: 'Error'
           });
           expect(result.error).toEqual({
             kind: 'Error',

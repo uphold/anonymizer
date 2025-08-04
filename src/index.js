@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-const { cloneDeep, cloneDeepWith, escapeRegExp, get, set } = require('lodash');
+const { cloneDeep, cloneDeepWith, escapeRegExp, get, isPlainObject, set } = require('lodash');
 const { serializeError: errorSerializer } = require('serialize-error');
 const stringify = require('json-stringify-safe');
 const traverse = require('traverse');
@@ -214,6 +214,13 @@ module.exports.anonymizer = (
  */
 
 function datadogErrorSerializer(error) {
+  if (!isPlainObject(error)) {
+    return {
+      details: error,
+      kind: 'Error'
+    };
+  }
+
   return {
     ...error,
     kind: error.name || 'Error'
