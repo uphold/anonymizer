@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-const { cloneDeep, cloneDeepWith, escapeRegExp, get, set } = require('lodash');
+const { cloneDeep, cloneDeepWith, escapeRegExp, get, isObject, set } = require('lodash');
 const { serializeError: errorSerializer } = require('serialize-error');
 const stringify = require('json-stringify-safe');
 const traverse = require('traverse');
@@ -153,7 +153,9 @@ module.exports.anonymizer = (
   const isBlacklisted = createPathTester(blacklist);
 
   return values => {
-    if (!(values instanceof Object)) {
+    // Use a prototype-agnostic check so that null-prototype objects (e.g. `querystring.parse()` or
+    // `OutgoingMessage#getHeaders()`) are still redacted.
+    if (!isObject(values)) {
       return values;
     }
 
