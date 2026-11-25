@@ -1,5 +1,17 @@
 # Changelog
 
+## [v6.0.3](https://github.com/uphold/anonymizer/releases/tag/v6.0.3) (2026-11-25)
+
+- Fix redaction bypass for null prototype objects [\#102](https://github.com/uphold/anonymizer/pull/102) ([satazor](https://github.com/satazor))
+- Bump basic-ftp from 5.2.0 to 5.2.2 [\#98](https://github.com/uphold/anonymizer/pull/98) ([dependabot](https://github.com/apps/dependabot))
+- Bump lodash from 4.17.23 to 4.18.1 [\#96](https://github.com/uphold/anonymizer/pull/96) ([dependabot](https://github.com/apps/dependabot))
+- Bump flatted from 3.2.7 to 3.4.2 [\#94](https://github.com/uphold/anonymizer/pull/94) ([dependabot](https://github.com/apps/dependabot))
+- Bump picomatch from 2.3.1 to 2.3.2 [\#95](https://github.com/uphold/anonymizer/pull/95) ([dependabot](https://github.com/apps/dependabot))
+- Bump braces from 3.0.2 to 3.0.3 [\#93](https://github.com/uphold/anonymizer/pull/93) ([dependabot](https://github.com/apps/dependabot))
+- Bump minimatch from 3.1.2 to 3.1.5 [\#92](https://github.com/uphold/anonymizer/pull/92) ([dependabot](https://github.com/apps/dependabot))
+- Bump basic-ftp from 5.0.4 to 5.2.0 [\#91](https://github.com/uphold/anonymizer/pull/91) ([dependabot](https://github.com/apps/dependabot))
+- Bump lodash from 4.17.21 to 4.17.23 [\#90](https://github.com/uphold/anonymizer/pull/90) ([dependabot](https://github.com/apps/dependabot))
+
 ## [v6.0.2](https://github.com/uphold/anonymizer/releases/tag/v6.0.2) (2025-04-15)
 - Fix redaction when double wildcards are used in certain conditions [\#88](https://github.com/uphold/anonymizer/pull/88) ([satazor](https://github.com/satazor))
 
