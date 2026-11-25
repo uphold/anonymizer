@@ -6,6 +6,7 @@
 
 const { anonymizer, serializers: builtinSerializers } = require('src');
 const { generateObjectSample, generateObjectSamplePaths } = require('./benchmark/samples');
+const { runInNewContext } = require('vm');
 
 /**
  * Test `Anonymizer`.
@@ -53,6 +54,20 @@ describe('Anonymizer', () => {
       const anonymize = anonymizer();
 
       expect(anonymize({ foo: Buffer.from('foobarfoobar') })).toEqual({ foo: '--REDACTED--' });
+    });
+
+    it('should obfuscate null-prototype objects', () => {
+      const anonymize = anonymizer({ whitelist: ['foo'] });
+      const values = Object.assign(Object.create(null), { foo: 'bar', qux: 'biz' });
+
+      expect(anonymize(values)).toEqual({ foo: 'bar', qux: '--REDACTED--' });
+    });
+
+    it('should obfuscate objects from another realm', () => {
+      const anonymize = anonymizer({ whitelist: ['foo'] });
+      const values = runInNewContext('({ foo: "bar", qux: "biz" })');
+
+      expect(anonymize(values)).toEqual({ foo: 'bar', qux: '--REDACTED--' });
     });
 
     describe('whitelist', () => {
